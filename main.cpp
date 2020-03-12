@@ -4,7 +4,7 @@
 #include <fstream>
 
 using namespace std;
-
+//Ill work on this tonight I need to study for math :|
 void charToIntegerArray(char* carray, int* &iarray, int &size);
 int pow(int a, int b);
 
