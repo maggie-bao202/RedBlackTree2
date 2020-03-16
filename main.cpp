@@ -4,9 +4,14 @@
 #include <fstream>
 
 using namespace std;
-//Ill work on this tonight I need to study for math :|
 void charToIntegerArray(char* carray, int* &iarray, int &size);
 int pow(int a, int b);
+void sort();
+bool search();
+void addToTree(Node* );
+void removeFromTree();
+void printTree();
+
 
 int main(){
   bool loop = true;
@@ -31,6 +36,38 @@ int main(){
   cout << "Integer Array:" << endl;
   for (int i = 0; i < (size); i++){
     cout << numberInput[i] << ",";
+  }
+  loop = true;
+  while (loop = true){
+    cout << "Type in a keyword (\"ADD\", \"SEARCH\",\"REMOVE\", \"PRINT\", or \"QUIT\"):"<<endl;
+    cin >> name; //put input into char array keyword
+    cin.ignore();
+    if (strcmp(name, "ADD") == 0){//if the input is ADD
+      cout << endl; //formatting
+      addToTree();
+      cout << endl;
+    }
+    else if (strcmp(name, "SEARCH") == 0){//Similar to above
+      cout << endl;
+      search();
+      cout << endl;
+    }
+    else if (strcmp(name, "REMOVE") == 0){
+      cout << endl;
+      removeFromTree();
+      cout << endl;
+    }
+    else if (strcmp(name, "PRINT") == 0){
+      cout << endl;
+      printTree();
+    }
+    else if (strcmp(name, "QUIT") == 0){//if quit, boolean is false so program will stop
+      cout << "Have a nice day!" << endl;
+      loop = false;
+    }
+    else{//if not a valid keyword
+      cout << "Make sure the keyword is capitalized." << endl;
+    }
   }
   cout << endl;
   return 0;
