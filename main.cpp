@@ -8,9 +8,13 @@ void charToIntegerArray(char* carray, int* &iarray, int &size);
 int pow(int a, int b);
 bool search(Node* current, int value);
 Node* addToTree(Node* current, int value);
-void removeFromTree(Node* &root, int value);
+Node* removeFromTree(Node* &current);
 void printOutput(Node* current);
-//void printTree(Node* root);
+Node* find(Node* current, int value);
+Node* successorRight(Node* current);
+Node* successorLeft(Node* current);
+//Node* getParent(Node* current, int value);
+void printTree(Node* current, int depth);
 
 int main(){
   bool loop = true;
@@ -68,7 +72,8 @@ int main(){
       cout << "Enter the number you want to remove: ";
       cin >> value;
       if(search(root, value) == true){
-	removeFromTree(root, value);
+	Node* temp = find(root, value);
+	root = removeFromTree(temp);
       }
       else {
 	cout << "Not a valid number.";
@@ -81,7 +86,7 @@ int main(){
     }
     else if (strcmp(name, "TREE") == 0){
       cout << endl;
-      //printTree(root);
+      printTree(root,0);
     }
     else if (strcmp(name, "QUIT") == 0){//if quit, boolean is false so program will stop
       cout << "Have a nice day!" << endl;
@@ -141,6 +146,7 @@ Node* addToTree(Node* current, int value){
   } 
 } 
 
+//Professor Fant's slides
 void printOutput(Node* current){
   if (current != NULL){
     printOutput(current->getLeft());
@@ -165,30 +171,170 @@ bool search(Node* current, int value){
   return false;
 }
 
-
-void removeFromTree(Node* &current, int value){
-  if (value < current->getLeft()->getData()){
-    removeFromTree(current->getLeft(), value);
+Node* find(Node* current, int value){
+  if (current == NULL){
+    return current;
   }
-  if (value > current->getRight()->getData()){
-    removeFromTree(current->getRight(), value);
+  if (value == current->getValue()){
+    return current;
   }
-  else{
-    if (current->getLeft() == NULL && current->getRight() == NULL){//a leaf
-      delete current;
-      current = NULL;
-    }
-    else if (current->getLeft() == NULL){//only right leaf
-      Node* temp = root;
-    }
-    else if (current->getRight() == NULL){//only left leaf
-      Node* child = current->getLeft()
-    }
-    else{//has both left and right child
-    }
+  if (value < current->getValue()){
+    return find(current->getLeft(), value);
+  }
+  if (value > current->getValue()){
+    return find(current->getRight(), value);
   }
 }
-  
-/*void printTree(NOde* root){
 
-}*/
+Node* successorRight(Node* current){
+  if (current->getLeft() == NULL){
+    return current;
+  }
+  else{
+    return successorRight(current->getLeft());
+  }
+}
+
+Node* successorLeft(Node* current){
+  if (current->getRight() == NULL){
+    return current;
+  }
+  else{
+    return successorLeft(current->getRight());
+  }
+}
+
+Node* removeFromTree(Node* &current){
+  if (current == NULL){
+    return current;
+  }
+  else if (current->getLeft() == NULL){
+    Node* right = current->getRight();
+    delete current;
+    return right;
+  }
+  else if(current->getRight() == NULL){
+    Node* left = current->getLeft();
+    delete current;
+    return left;
+  }
+  else{
+  }
+  
+}
+
+void printTree(Node* current, int depth){
+  if (current == NULL){
+    return;
+  }
+  printTree(current->getRight(), depth+1);
+  for(int i = 0; i < depth; i++){
+    cout << "\t";
+  }
+  cout << current->getValue() << endl;
+  printTree(current->getLeft(), depth+1);
+}
+
+
+  
+/*void removeFromTree(Node* &root, Node* current, int value){
+  if (value < current->getLeft()->getValue()){
+    removeFromTree(root, current->getLeft(), value);
+  }
+  if (value > current->getRight()->getValue()){
+    removeFromTree(root, current->getRight(), value);
+  }
+  if (current->getLeft() == NULL && current->getRight() == NULL){//a leaf
+    if (getParent(root, current->getValue()) == NULL){
+      current->setValue(0);
+      return;
+    }
+    if (current->getValue() <= getParent(root, current->getValue())->getValue()){
+      getParent(root, current->getValue())->setLeft(NULL);
+    }
+    else{
+      getParent(root, current->getValue())->setRight(NULL);
+    }
+    delete current;
+    current = NULL;
+  }
+  else if (current->getLeft() == NULL){//only right leaf
+    Node* temp = current->getRight();
+    if (getParent(root, current->getValue()) == NULL){
+      current->setValue(temp->getValue());
+      current->setRight(temp->getRight());
+      current->setLeft(temp->getLeft());
+      getParent(root, temp->getLeft()->getValue()) = current;
+      if (temp->getLeft() != NULL){
+	getParent(root, temp->getLeft()->getValue()) = current;
+      }
+      if (temp->getRight() != NULL){
+	getParent(root, temp->getRight()->getValue()) = current;
+      }
+      delete temp;
+    }
+    else{
+      Node* parent = getParent(root, current->getValue());
+      delete current;
+      current = NULL;
+      if (temp->getValue() <= parent->getValue()){
+	parent->setLeft(temp);
+      }
+      else{
+	parent->setRight(temp);
+      }
+      getParent(root, temp->getValue()) = parent;
+    }
+  }
+  else if (current->getRight() == NULL){//only left leaf
+    Node* temp = current->getLeft();
+    if (getParent(root, current->getValue()) == NULL){
+      current->setValue(temp->getValue());
+      current->setRight(temp->getRight());
+      current->setLeft(temp->getLeft());
+      getParent(root, temp->getLeft()->getValue()) = current;
+      if (temp->getLeft() != NULL){
+        getParent(root, temp->getLeft()->getValue()) = current;
+      }
+      if (temp->getRight() != NULL){
+        getParent(root, temp->getRight()->getValue()) = current;
+      }
+      delete temp;
+    }
+    else{
+      Node* parent = getParent(root, current->getValue());
+      delete current;
+      current = NULL;
+      if (temp->getValue() <= parent->getValue()){
+        parent->setLeft(temp);
+      }
+      else{
+        parent->setRight(temp);
+      }
+      getParent(root, temp->getValue()) = parent;
+    }
+  }
+  else{//has both left and right child
+    return;
+  }
+  }/*
+  
+/*
+Node* getParent(Node* current, int value){
+  if (current == NULL || (current->getLeft() == NULL && current->getRight() == NULL)){
+    return NULL;
+  }
+  else if (current->getLeft() != NULL && current->getLeft()->getValue() == value){
+    return current;
+  }
+  else if (current->getRight() != NULL && current->getRight()->getValue() == value){
+    return current;
+  }
+  if (value < current->getValue()){
+    return getParent(current->getLeft(), value);
+  }
+  if (value > current->getValue()){
+    return getParent(current->getRight(), value);
+  }
+}
+*/
