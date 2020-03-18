@@ -6,11 +6,11 @@
 using namespace std;
 void charToIntegerArray(char* carray, int* &iarray, int &size);
 int pow(int a, int b);
-//bool search();
+bool search(Node* current, int value);
 Node* addToTree(Node* current, int value);
-//void removeFromTree();
+void removeFromTree(Node* &root, int value);
 void printOutput(Node* current);
-
+//void printTree(Node* root);
 
 int main(){
   bool loop = true;
@@ -54,13 +54,25 @@ int main(){
       cout << endl;
     }
     else if (strcmp(name, "SEARCH") == 0){//Similar to above
-      cout << endl;
-      //search();
+      cout << "Enter the number you want to search: ";
+      cin >> value;
+      if (search(root, value) == true){
+	cout << "The number " << value << " exists within the tree.";
+      }
+      else {
+	cout << "The number " << value << " does not exist within the tree.";
+      }	
       cout << endl;
     }
     else if (strcmp(name, "REMOVE") == 0){
-      cout << endl;
-      //removeFromTree();
+      cout << "Enter the number you want to remove: ";
+      cin >> value;
+      if(search(root, value) == true){
+	removeFromTree(root, value);
+      }
+      else {
+	cout << "Not a valid number.";
+      }
       cout << endl;
     }
     else if (strcmp(name, "OUTPUT") == 0){
@@ -135,5 +147,48 @@ void printOutput(Node* current){
     cout << current->getValue() << ",";
     printOutput(current->getRight());
   } 
-} 
-   
+}
+
+
+bool search(Node* current, int value){
+  while (current != NULL){
+    if (value == current->getValue()){
+      return true;
+    }
+    if (value < current->getValue()){
+      return search(current->getLeft(), value);
+    }
+    if (value > current->getValue()){
+      return search(current->getRight(), value);
+    }
+  }
+  return false;
+}
+
+
+void removeFromTree(Node* &current, int value){
+  if (value < current->getLeft()->getData()){
+    removeFromTree(current->getLeft(), value);
+  }
+  if (value > current->getRight()->getData()){
+    removeFromTree(current->getRight(), value);
+  }
+  else{
+    if (current->getLeft() == NULL && current->getRight() == NULL){//a leaf
+      delete current;
+      current = NULL;
+    }
+    else if (current->getLeft() == NULL){//only right leaf
+      Node* temp = root;
+    }
+    else if (current->getRight() == NULL){//only left leaf
+      Node* child = current->getLeft()
+    }
+    else{//has both left and right child
+    }
+  }
+}
+  
+/*void printTree(NOde* root){
+
+}*/
