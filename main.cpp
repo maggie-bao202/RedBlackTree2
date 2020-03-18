@@ -6,17 +6,17 @@
 using namespace std;
 void charToIntegerArray(char* carray, int* &iarray, int &size);
 int pow(int a, int b);
-void sort();
-bool search();
-void addToTree(Node* );
-void removeFromTree();
-void printTree();
+//bool search();
+Node* addToTree(Node* current, int value);
+//void removeFromTree();
+void printOutput(Node* current);
 
 
 int main(){
   bool loop = true;
   char* name = new char[20];
-  char* input = new char[200];
+  char* input = new char[2000];
+  Node* root = NULL;
   while (loop == true){
     cout << "Enter the name of the file: " << endl;
     cin.getline(name, 20, '\n');
@@ -30,40 +30,51 @@ int main(){
     }
     fileStream.close();
   }
-  int* numberInput = new int [101];
+  int* numberInput = new int[101];
   int size = 0;
   charToIntegerArray(input, numberInput, size);
   cout << "Integer Array:" << endl;
   for (int i = 0; i < (size); i++){
     cout << numberInput[i] << ",";
   }
+  for (int i = 0; i < (size); i++){
+    root = addToTree(root, numberInput[i]);
+  }
   loop = true;
+  cout << endl;
+  int value = 0;
   while (loop = true){
-    cout << "Type in a keyword (\"ADD\", \"SEARCH\",\"REMOVE\", \"PRINT\", or \"QUIT\"):"<<endl;
+    cout << "Type in a keyword (\"ADD\", \"SEARCH\",\"REMOVE\", \"OUTPUT\", \"TREE\" or \"QUIT\"):"<<endl;
     cin >> name; //put input into char array keyword
     cin.ignore();
     if (strcmp(name, "ADD") == 0){//if the input is ADD
-      cout << endl; //formatting
-      addToTree();
+      cout << "Enter the number you want to add: ";
+      cin >> value;
+      addToTree(root, value);
       cout << endl;
     }
     else if (strcmp(name, "SEARCH") == 0){//Similar to above
       cout << endl;
-      search();
+      //search();
       cout << endl;
     }
     else if (strcmp(name, "REMOVE") == 0){
       cout << endl;
-      removeFromTree();
+      //removeFromTree();
       cout << endl;
     }
-    else if (strcmp(name, "PRINT") == 0){
+    else if (strcmp(name, "OUTPUT") == 0){
+      printOutput(root);
       cout << endl;
-      printTree();
+    }
+    else if (strcmp(name, "TREE") == 0){
+      cout << endl;
+      //printTree(root);
     }
     else if (strcmp(name, "QUIT") == 0){//if quit, boolean is false so program will stop
       cout << "Have a nice day!" << endl;
       loop = false;
+      return 0;
     }
     else{//if not a valid keyword
       cout << "Make sure the keyword is capitalized." << endl;
@@ -104,3 +115,25 @@ void charToIntegerArray(char* carray, int* &iarray, int &size){//converts a char
     }
   }
 }
+
+Node* addToTree(Node* current, int value){ 
+  if (current == NULL){
+    Node* temp = new Node(value);
+    return temp; 
+  }
+  if (value < current->getValue()){
+    current->setLeft(addToTree(current->getLeft(), value));
+  }
+  else{
+    current->setRight(addToTree(current->getRight(), value));
+  } 
+} 
+
+void printOutput(Node* current){
+  if (current != NULL){
+    printOutput(current->getLeft());
+    cout << current->getValue() << ",";
+    printOutput(current->getRight());
+  } 
+} 
+   
