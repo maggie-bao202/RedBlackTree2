@@ -8,11 +8,10 @@ void charToIntegerArray(char* carray, int* &iarray, int &size);
 int pow(int a, int b);
 bool search(Node* current, int value);
 Node* addToTree(Node* current, int value);
-void removeFromTree(Node* &current);
-void printOutput(Node* current);
+void removeFromTree(Node* &root, Node* &current);
+void printSort(Node* current);
 Node* find(Node* current, int value);
 Node* successorRight(Node* current);
-Node* successorLeft(Node* current);
 void printTree(Node* current, int depth);
 
 int main(){
@@ -47,13 +46,13 @@ int main(){
   cout << endl;
   int value = 0;
   while (loop = true){
-    cout << "Type in a keyword (\"ADD\", \"SEARCH\",\"REMOVE\", \"OUTPUT\", \"TREE\" or \"QUIT\"):"<<endl;
+    cout << "Type in a keyword (\"ADD\", \"SEARCH\",\"REMOVE\", \"SORT\", \"TREE\" or \"QUIT\"):"<<endl;
     cin >> name; //put input into char array keyword
     cin.ignore();
     if (strcmp(name, "ADD") == 0){//if the input is ADD
       cout << "Enter the number you want to add: ";
       cin >> value;
-      addToTree(root, value);
+      root = addToTree(root, value);
       cout << endl;
     }
     else if (strcmp(name, "SEARCH") == 0){//Similar to above
@@ -72,15 +71,15 @@ int main(){
       cin >> value;
       if(search(root, value) == true){
 	Node* temp = find(root, value);
-	removeFromTree(temp);
+	removeFromTree(root, temp);
       }
       else {
 	cout << "Not a valid number.";
       }
       cout << endl;
     }
-    else if (strcmp(name, "OUTPUT") == 0){
-      printOutput(root);
+    else if (strcmp(name, "SORT") == 0){
+      printSort(root);
       cout << endl;
     }
     else if (strcmp(name, "TREE") == 0){
@@ -88,6 +87,9 @@ int main(){
       printTree(root,0);
     }
     else if (strcmp(name, "QUIT") == 0){//if quit, boolean is false so program will stop
+      while (root){
+	removeFromTree(root, root);
+      }
       cout << "Have a nice day!" << endl;
       loop = false;
       return 0;
@@ -132,7 +134,7 @@ void charToIntegerArray(char* carray, int* &iarray, int &size){//converts a char
   }
 }
 
-Node* addToTree(Node* current, int value){ 
+Node* addToTree(Node* current, int value){//returns the root 
   if (current == NULL){
     Node* temp = new Node(value);
     return temp; 
@@ -151,17 +153,17 @@ Node* addToTree(Node* current, int value){
   return current;
 } 
 
-//Professor Fant's slides
-void printOutput(Node* current){
+//Professor Fant's slides 
+void printSort(Node* current){//Prints out the sorted tree from least to greatest
   if (current != NULL){
-    printOutput(current->getLeft());
+    printSort(current->getLeft());
     cout << current->getValue() << ",";
-    printOutput(current->getRight());
+    printSort(current->getRight());
   } 
 }
 
 
-bool search(Node* current, int value){
+bool search(Node* current, int value){//Searches for a node with matching value as user input. If not found, return false.
   while (current != NULL){
     if (value == current->getValue()){
       return true;
@@ -176,7 +178,7 @@ bool search(Node* current, int value){
   return false;
 }
 
-Node* find(Node* current, int value){
+Node* find(Node* current, int value){//Returns the node in which the value matches up to. Used for delete function
   if (current == NULL){
     return current;
   }
@@ -200,22 +202,14 @@ Node* successorRight(Node* current){
   }
 }
 
-Node* successorLeft(Node* current){
-  if (current->getRight() == NULL){
-    return current;
-  }
-  else{
-    return successorLeft(current->getRight());
-  }
-}
-
-void removeFromTree(Node* &current){
+void removeFromTree(Node* &root, Node* &current){
   if (current == NULL){
     return;
   }
   if (current->getLeft() == NULL && current->getRight() == NULL){//Case 1
     if (current->getParent() == NULL){//if root
-      current->setValue(0);
+      Node* temp = current;
+      current = NULL;
       return;
     }
     if(current == current->getParent()->getLeft()){//if it is the parent's left child, set to left child to null
@@ -228,19 +222,18 @@ void removeFromTree(Node* &current){
     current = NULL;
     return;
   }
-  else if (current->getLeft() != NULL && current->getRight() != NULL){
-    Node* successor = successorLeft(current->getRight());
+  else if (current->getLeft() != NULL && current->getRight() != NULL){//two child
+    Node* successor = successorRight(current->getRight());
     int value = successor->getValue();
-    removeFromTree(successor);
+    removeFromTree(root, successor);
     current->setValue(value);
   }
-  else if (current->getLeft() == NULL){
+  else if (current->getLeft() == NULL){//right child
     if (current->getParent() == NULL){
-       Node* temp = current;
-       current = current->getRight();
-	current->setParent(NULL);
-	delete temp;
-	return;
+      root = current->getRight();
+      root->setParent(NULL);
+      delete current;
+      return;
     }
     Node* right = current->getRight();
     if(current == current->getParent()->getLeft()){
@@ -252,12 +245,11 @@ void removeFromTree(Node* &current){
       delete current;
     }
   }
-  else{
+  else{//left child
     if (current->getParent() == NULL){
-      Node* temp = current;
-      current = current->getLeft();
-      current->setParent(NULL);
-      delete temp;
+      root = current->getLeft();
+      root->setParent(NULL);
+      delete current;
       return;
     }
     Node* left = current->getLeft();
