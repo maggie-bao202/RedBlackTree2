@@ -10,37 +10,44 @@ bool search(Node* current, int value);
 Node* addToTree(Node* current, int value);
 void removeFromTree(Node* &root, Node* &current);
 void printSort(Node* current);
-Node* find(Node* current, int value);
+Node* getNode(Node* current, int value);
 Node* successorRight(Node* current);
 void printTree(Node* current, int depth);
+
+/*3/19/2020 Author: Maggie Bao Description: The program takes a list 
+of numbers from a text file and converts it into a binary search tree. 
+The user could be able to add, search, and remove nodes from the tree. 
+Additionally, the user could print out a visual of the sideways tree 
+and print out the sorted output.*/
+
 
 int main(){
   bool loop = true;
   char* name = new char[20];
   char* input = new char[2000];
   Node* root = NULL;
-  while (loop == true){
+  while (loop == true){//Read file input code modified from my Heap assignment
     cout << "Enter the name of the file: " << endl;
     cin.getline(name, 20, '\n');
     ifstream fileStream (name);
-    if (fileStream.is_open()){
+    if (fileStream.is_open()){//open file with name from input
       fileStream.getline(input, 200);
       loop = false;
     }
-    else{
+    else{//loop until a valid file name is entered
       cout << "Invalid file name." << endl;
     }
     fileStream.close();
   }
   int* numberInput = new int[101];
   int size = 0;
-  charToIntegerArray(input, numberInput, size);
-  cout << "Integer Array:" << endl;
+  charToIntegerArray(input, numberInput, size);//convert char* to int * array
+  /*cout << "Integer Array:" << endl;
   for (int i = 0; i < (size); i++){
     cout << numberInput[i] << ",";
-  }
-  for (int i = 0; i < (size); i++){
-    root = addToTree(root, numberInput[i]);
+  }*/
+  for (int i = 0; i < (size); i++){//insert integers into tree, one by one
+    root = addToTree(root, numberInput[i]);//addToTree returns the root each time
   }
   loop = true;
   cout << endl;
@@ -52,13 +59,13 @@ int main(){
     if (strcmp(name, "ADD") == 0){//if the input is ADD
       cout << "Enter the number you want to add: ";
       cin >> value;
-      root = addToTree(root, value);
+      root = addToTree(root, value);//insert new value into tree
       cout << endl;
     }
     else if (strcmp(name, "SEARCH") == 0){//Similar to above
       cout << "Enter the number you want to search: ";
       cin >> value;
-      if (search(root, value) == true){
+      if (search(root, value) == true){//search is a bool function. Traverses down the tree to see if input matches with a node value
 	cout << "The number " << value << " exists within the tree.";
       }
       else {
@@ -69,9 +76,9 @@ int main(){
     else if (strcmp(name, "REMOVE") == 0){
       cout << "Enter the number you want to remove: ";
       cin >> value;
-      if(search(root, value) == true){
-	Node* temp = find(root, value);
-	removeFromTree(root, temp);
+      if(search(root, value) == true){//first checks if deleting value is within the tree
+	Node* temp = getNode(root, value); //traverses to deleted node in "temp"
+	removeFromTree(root, temp); //removes the node from tree
       }
       else {
 	cout << "Not a valid number.";
@@ -79,15 +86,15 @@ int main(){
       cout << endl;
     }
     else if (strcmp(name, "SORT") == 0){
-      printSort(root);
+      printSort(root);//prints out sorted list, smallest to largest
       cout << endl;
     }
     else if (strcmp(name, "TREE") == 0){
       cout << endl;
-      printTree(root,0);
+      printTree(root,0);//prints visual of tree
     }
     else if (strcmp(name, "QUIT") == 0){//if quit, boolean is false so program will stop
-      while (root){
+      while (root != NULL){//keep on removing root until last root is removed. I'm not sure why this sends an error
 	removeFromTree(root, root);
       }
       cout << "Have a nice day!" << endl;
@@ -101,6 +108,8 @@ int main(){
   cout << endl;
   return 0;
 }
+
+//pow and charToIntegerArray function copied straight from my Heap assignment
 
 int pow(int a, int b){//pow(10, 4) = 10^4, power function
   int x = 1;
@@ -134,20 +143,20 @@ void charToIntegerArray(char* carray, int* &iarray, int &size){//converts a char
   }
 }
 
-Node* addToTree(Node* current, int value){//returns the root 
-  if (current == NULL){
+Node* addToTree(Node* current, int value){//adds a new node with integer value and returns the root each time (in case of NULL tree)
+  if (current == NULL){//if nothing in tree
     Node* temp = new Node(value);
     return temp; 
   }
-  if (value < current->getValue()){
+  if (value < current->getValue()){//value is smaller than current node, go to left child
     Node* child = addToTree(current->getLeft(), value);
-    child->setParent(current);
+    child->setParent(current); //after reach a leaf, set the child parent relationship
     current->setLeft(child);
     
   }
-  else{
+  else{//value is larger (or equal to) go right
     Node* child = addToTree(current->getRight(), value);
-    child->setParent(current);
+    child->setParent(current); //after reach a leaf, set child parent relationship
     current->setRight(child);
   }
   return current;
@@ -178,7 +187,7 @@ bool search(Node* current, int value){//Searches for a node with matching value 
   return false;
 }
 
-Node* find(Node* current, int value){//Returns the node in which the value matches up to. Used for delete function
+Node* getNode(Node* current, int value){//Returns the node in which the value matches up to. Used for delete function
   if (current == NULL){
     return current;
   }
