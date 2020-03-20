@@ -143,6 +143,7 @@ void charToIntegerArray(char* carray, int* &iarray, int &size){//converts a char
   }
 }
 
+//Used https://www.geeksforgeeks.org/binary-search-tree-set-1-search-and-insertion/
 Node* addToTree(Node* current, int value){//adds a new node with integer value and returns the root each time (in case of NULL tree)
   if (current == NULL){//if nothing in tree
     Node* temp = new Node(value);
@@ -170,7 +171,6 @@ void printSort(Node* current){//Prints out the sorted tree from least to greates
     printSort(current->getRight());
   } 
 }
-
 
 bool search(Node* current, int value){//Searches for a node with matching value as user input.
   while (current != NULL){
@@ -211,6 +211,7 @@ Node* leftMostNode(Node* current){//find the left most node in tree for the inor
   }
 }
 
+//Used https://www.techiedelight.com/deletion-from-bst/
 void removeFromTree(Node* &root, Node* &current){//take in node to be deleted and delete according to the 3 cases
   if (current == NULL){//if nothing in tree
     return;
