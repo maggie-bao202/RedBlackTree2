@@ -94,9 +94,9 @@ int main(){
       printTree(root,0);//prints visual of tree
     }
     else if (strcmp(name, "QUIT") == 0){//if quit, boolean is false so program will stop
-      while (root != NULL){//keep on removing root until NULL. I'm not sure why this sends an error
+      /*while (root != NULL){//keep on removing root until NULL. I'm not sure why this sends an error
 	removeFromTree(root, root);
-      }
+	}*/
       cout << "Have a nice day!" << endl;
       loop = false;
       return 0;
