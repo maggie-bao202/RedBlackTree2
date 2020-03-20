@@ -94,7 +94,7 @@ int main(){
       printTree(root,0);//prints visual of tree
     }
     else if (strcmp(name, "QUIT") == 0){//if quit, boolean is false so program will stop
-      while (root != NULL){//keep on removing root until last root is removed. I'm not sure why this sends an error
+      while (root != NULL){//keep on removing root until NULL. I'm not sure why this sends an error
 	removeFromTree(root, root);
       }
       cout << "Have a nice day!" << endl;
@@ -109,7 +109,7 @@ int main(){
   return 0;
 }
 
-//pow and charToIntegerArray function copied straight from my Heap assignment
+//pow and charToIntegerArray function taken straight from my Heap assignment
 
 int pow(int a, int b){//pow(10, 4) = 10^4, power function
   int x = 1;
@@ -172,115 +172,116 @@ void printSort(Node* current){//Prints out the sorted tree from least to greates
 }
 
 
-bool search(Node* current, int value){//Searches for a node with matching value as user input. If not found, return false.
+bool search(Node* current, int value){//Searches for a node with matching value as user input.
   while (current != NULL){
-    if (value == current->getValue()){
+    if (value == current->getValue()){//if value matches up, return true
       return true;
     }
-    if (value < current->getValue()){
+    if (value < current->getValue()){//traverse down the tree
       return search(current->getLeft(), value);
     }
     if (value > current->getValue()){
       return search(current->getRight(), value);
     }
   }
-  return false;
+  return false;//if not found when reach the end of tree, return false
 }
 
 Node* getNode(Node* current, int value){//Returns the node in which the value matches up to. Used for delete function
-  if (current == NULL){
+  if (current == NULL){//not really necessary but it is here
     return current;
   }
-  if (value == current->getValue()){
+  if (value == current->getValue()){//if value is found, stop searching and return the node
     return current;
   }
-  if (value < current->getValue()){
-    return find(current->getLeft(), value);
+  if (value < current->getValue()){//if value is smaller, go to left child and look
+    return getNode(current->getLeft(), value);
   }
-  if (value > current->getValue()){
-    return find(current->getRight(), value);
+  if (value > current->getValue()){//if value is larger, go to right child and look
+    return getNode(current->getRight(), value);
   }
 }
 
-Node* successorRight(Node* current){
-  if (current->getLeft() == NULL){
+Node* leftMostNode(Node* current){//find the left most node in tree for the inorder successor using recursion
+  if (current->getLeft() == NULL){//if its the last node before NULL, return that node
     return current;
   }
   else{
-    return successorRight(current->getLeft());
+    return leftMostNode(current->getLeft());//traverse to left child
   }
 }
 
-void removeFromTree(Node* &root, Node* &current){
-  if (current == NULL){
+void removeFromTree(Node* &root, Node* &current){//take in node to be deleted and delete according to the 3 cases
+  if (current == NULL){//if nothing in tree
     return;
   }
-  if (current->getLeft() == NULL && current->getRight() == NULL){//Case 1
-    if (current->getParent() == NULL){//if root
-      Node* temp = current;
+  if (current->getLeft() == NULL && current->getRight() == NULL){//Case 1: Node does not have any children aka a leaf
+    if (current->getParent() == NULL){//if it is just the root
+      delete current;
       current = NULL;
+      root = NULL;
       return;
     }
-    if(current == current->getParent()->getLeft()){//if it is the parent's left child, set to left child to null
+    if(current == current->getParent()->getLeft()){//if it is the parent's left child, set parent's left child pointer to null
       current->getParent()->setLeft(NULL);
     }
     else {//same for right child
       current->getParent()->setRight(NULL);
     }
-    delete current;
+    delete current;//clear contents of node and set to null
     current = NULL;
     return;
   }
-  else if (current->getLeft() != NULL && current->getRight() != NULL){//two child
-    Node* successor = successorRight(current->getRight());
+  else if (current->getLeft() != NULL && current->getRight() != NULL){//Case 2: Node has both children
+    Node* successor = leftMostNode(current->getRight()); //inorder successor is the left most child on right side
     int value = successor->getValue();
-    removeFromTree(root, successor);
+    removeFromTree(root, successor);//remove the successor and set the successor value inside the current value
     current->setValue(value);
   }
-  else if (current->getLeft() == NULL){//right child
-    if (current->getParent() == NULL){
-      root = current->getRight();
+  else if (current->getLeft() == NULL){//Case 3: Node has 1 child. If only right child
+    if (current->getParent() == NULL){//If root
+      root = current->getRight(); //make the right child new root
       root->setParent(NULL);
       delete current;
       return;
     }
     Node* right = current->getRight();
-    if(current == current->getParent()->getLeft()){
-      current->getParent()->setLeft(right);
+    if(current == current->getParent()->getLeft()){//if current is the left node of parent
+      current->getParent()->setLeft(right);//link the left node of parent with the child of current
     }
-    else{
+    else{//if current is right node of parent
       current->getParent()->setRight(right);
-      right->setParent(current->getParent());
-      delete current;
     }
+    right->setParent(current->getParent());//reassign parent
+      delete current;
   }
-  else{//left child
-    if (current->getParent() == NULL){
-      root = current->getLeft();
+  else{//only has left child
+    if (current->getParent() == NULL){//if root
+      root = current->getLeft();//make left child new root
       root->setParent(NULL);
       delete current;
       return;
     }
     Node* left = current->getLeft();
-    if(current == current->getParent()->getLeft()){
+    if(current == current->getParent()->getLeft()){//if current is left node of parent
       current->getParent()->setLeft(left);
     }
-    else{
+    else{//if current is right node of parent
       current->getParent()->setRight(left);
-      left->setParent(current->getParent());
-      delete current;
     }
+    left->setParent(current->getParent());//reassign parent
+      delete current;
   }
 }
 
-void printTree(Node* current, int depth){
+void printTree(Node* current, int depth){//print sideways tree. Depth keeps track of tabs
   if (current == NULL){
     return;
   }
-  printTree(current->getRight(), depth+1);
-  for(int i = 0; i < depth; i++){
+  printTree(current->getRight(), depth+1);//incrementing tabs to bottom most right
+  for(int i = 0; i < depth; i++){//print the amount of tabs, then print value
     cout << "\t";
   }
   cout << current->getValue() << endl;
-  printTree(current->getLeft(), depth+1);
+  printTree(current->getLeft(), depth+1);//end at bottom most left node
 }
