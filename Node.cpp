@@ -5,12 +5,11 @@ using namespace std;
 
 Node :: Node(int newvalue){
   value = newvalue;
-  color = 0;
+  color = 1;
   left = NULL;
   right = NULL;
   parent = NULL;
 }
-//getters
 
 int Node :: getValue(){
   return value;
@@ -30,6 +29,17 @@ Node* Node :: getRight(){
 
 Node* Node :: getParent(){
   return parent;
+}
+
+Node* Node :: getGrandparent(){
+  return parent->getParent();
+}
+
+Node* Node :: getUncle(){
+  if (getGrandparent()->getValue() < parent->getValue()){
+    return getGrandparent()->getLeft();
+  }
+  return getGrandparent()->getRight();
 }
 
 void Node :: setValue(int newvalue){

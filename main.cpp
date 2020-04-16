@@ -7,15 +7,17 @@ using namespace std;
 void charToIntegerArray(char* carray, int* &iarray, int &size);
 int pow(int a, int b);
 Node* add(Node* current, int value);
-void printTree(Node* current, int depth);
+void print(Node* current, int depth);
+
 
 int main(){
   bool loop = true;
   char* name = new char[20];
   char* input = new char[2000];
   Node* root = NULL;
+  int value = 0;
   while (loop = true){
-    cout << "Type in a keyword (\"ADD\", \"READ\",\"REMOVE\",\"TREE\" or \"QUIT\"):"<<endl;
+    cout << "Type in a keyword (\"ADD\", \"READ\",\"REMOVE\",\"PRINT\" or \"QUIT\"):"<<endl;
     cin >> name; //put input into char array keyword
     cin.ignore();
     if (strcmp(name, "ADD") == 0){//if the input is ADD
@@ -38,6 +40,7 @@ int main(){
        }
        fileStream.close();
       }
+      loop = true;
       int* numberInput = new int[101];
       int size = 0;
       charToIntegerArray(input, numberInput, size);//convert char* to int * array
@@ -57,9 +60,9 @@ int main(){
       }
       cout << endl;*/
     }
-    else if (strcmp(name, "TREE") == 0){
+    else if (strcmp(name, "PRINT") == 0){
       cout << endl;
-      printTree(root,0);//prints visual of tree
+      print(root,0);//prints visual of tree
     }
     else if (strcmp(name, "QUIT") == 0){//if quit, boolean is false so program will stop
       cout << "Have a nice day!" << endl;
@@ -114,24 +117,27 @@ Node* add(Node* current, int value){//adds a new node with integer value and ret
     return temp; 
   }
   if (value < current->getValue()){//value is smaller than current node, go to left child
-    Node* child = addToTree(current->getLeft(), value);
+    Node* child = add(current->getLeft(), value);
     child->setParent(current); //after reach a leaf, set the child parent relationship
     current->setLeft(child);
     
   }
   else{//value is larger (or equal to) go right
-    Node* child = addToTree(current->getRight(), value);
+    Node* child = add(current->getRight(), value);
     child->setParent(current); //after reach a leaf, set child parent relationship
     current->setRight(child);
   }
   return current;
 }
 
-printTree(Node* current, int depth){
-  printTree(current->getRight(), depth+1);//incrementing tabs to bottom most right
-  for(int i = 0; i < depth; i++){//print the amount of tabs, then print value
-    cout << "\t";
+void print(Node* current, int depth){
+  if (current = NULL){
+    return;
   }
-  cout << current->getValue() << endl;
-  printTree(current->getLeft(), depth+1);//end at bottom most left node
+  print(current->getRight(), depth+1);//incrementing tabs to bottom most right
+  for(int i = 0; i < depth; i++){//print the amount of tabs, then print value
+    cout << "  ";
+  }
+  cout << current->getColor() << current->getValue() << endl;
+  print(current->getLeft(), depth+1);//end at bottom most left node
 }

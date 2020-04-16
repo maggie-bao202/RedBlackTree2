@@ -12,6 +12,8 @@ class Node {
   Node* getLeft();
   Node* getRight();
   Node* getParent();
+  Node* getGrandparent();
+  Node* getUncle();
   void setValue(int newvalue);
   void setColor(int newcolor);
   void setLeft(Node* newleft);
