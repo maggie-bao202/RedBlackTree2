@@ -5,6 +5,7 @@ using namespace std;
 
 Node :: Node(int newvalue){
   value = newvalue;
+  color = 0;
   left = NULL;
   right = NULL;
   parent = NULL;
@@ -13,6 +14,10 @@ Node :: Node(int newvalue){
 
 int Node :: getValue(){
   return value;
+}
+
+int Node :: getColor(){
+  return color;
 }
 
 Node* Node :: getLeft(){
@@ -30,6 +35,11 @@ Node* Node :: getParent(){
 void Node :: setValue(int newvalue){
   value = newvalue;
 }
+
+void Node :: setColor(int newcolor){
+  color = newcolor;
+}
+
 void Node :: setLeft(Node* newleft){
   left = newleft;
 }
