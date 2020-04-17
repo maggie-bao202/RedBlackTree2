@@ -6,11 +6,14 @@
 using namespace std;
 void charToIntegerArray(char* carray, int* &iarray, int &size);
 int pow(int, int);
-Node* add(Node*, int);
+Node* insert(Node*, Node*);
+void add(Node*, Node*);
+void rearrange(Node*);
 void print(Node*, int);
 void rotateLeft(Node*);
 void rotateRight(Node*);
-void case4(Node*;
+void case3(Node*);
+void case4(Node*);
 void case4part2(Node*);
 /*Red Black Tree: A type of balanced search tree. Root and NULL nodes are black. If a node is red, children are black. All paths from a node to NULL descendents contain same number of black nodes. Shortest path has all black nodes. Longest alternates between red and black. Insert and remove requires rotation.*/
 
@@ -27,7 +30,7 @@ int main(){
     if (strcmp(name, "ADD") == 0){//if the input is ADD
       cout << "Enter the number you want to add: ";
       cin >> value;
-      root = add(root, value);//insert new value into tree
+      root = insert(root, new Node(value));//insert new value into tree
       cout << endl;
     }
     else if (strcmp(name, "READ") == 0){//Similar to above
@@ -47,16 +50,9 @@ int main(){
       loop = true;
       int* numberInput = new int[101];
       int size = 0;
-      char* temp = NULL;
       charToIntegerArray(input, numberInput, size);//convert char* to int * array
       for (int i = 0; i < (size); i++){//insert integers into tree, one by one
-	temp = new Node(numberInput[i]);
-	add(root, temp);
-	rearrange(temp);
-	root = temp;
-	while (root->getParent() != NULL){
-	  root = root->getParent();
-	}
+	root = insert(root, new Node(numberInput[i]));
       }
     }
     else if (strcmp(name, "REMOVE") == 0){/*
@@ -155,9 +151,12 @@ void rotateRight(Node* blue){
   blue->setLeft(yellow->getRight());
   yellow->setRight(blue);
   blue->setParent(yellow);
+  if (blue->getLeft() != NULL){
+    blue->getLeft()->setParent(blue);
+  }
   if (parent != NULL){
-    if (blue->getLeft() != NULL){
-      blue->getLeft->setParent(blue);
+    if (blue == parent->getLeft()){
+      parent->setLeft(yellow);
     }
     else if (blue == parent->getRight()){
       parent->setRight(yellow);
@@ -167,10 +166,20 @@ void rotateRight(Node* blue){
 }
 
 
-void add(Node* &current, Node* node){//adds a new node with integer value and returns the root each time (in case of NULL tree)
+Node* insert(Node* root, Node* node){
+  add(node, root);
+  rearrange(node);
+  root = node;
+  while(root->getParent() != NULL){
+    root = root->getParent();
+  }
+  return root;
+}
+ 
+void add(Node* current, Node* node){//adds a new node with integer value and returns the root each time (in case of NULL tree)
   if (current == NULL){//if nothing in tree
-    Node* temp = node;
-    return temp; 
+    current = node;
+    return; 
   }
   if (node->getValue() < current->getValue()){//value is smaller than current node, go to left child
     if (current->getLeft()){
@@ -198,7 +207,7 @@ void rearrange(Node* current){
   if (current->getParent() == NULL){
     current->setColor(1);
   }
-  else if (current->getParent()->getColor == 1){
+  else if (current->getParent()->getColor() == 1){
     //nothing
   }
   else if (current->getUncle() != NULL && current->getUncle()->getColor() == 2){
@@ -212,7 +221,7 @@ void rearrange(Node* current){
 
 void case3(Node* current){
   current->getParent()->setColor(1);
-  current->getUncle()->setParent(1);
+  current->getUncle()->setColor(1);
   current->getGrandparent()->setColor(2);
   rearrange(current->getGrandparent());
 }
