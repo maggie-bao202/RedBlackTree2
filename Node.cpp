@@ -35,11 +35,29 @@ Node* Node :: getGrandparent(){
   return parent->getParent();
 }
 
+Node* Node :: getSibling(){
+  if (parent == NULL){
+    return NULL;
+  }
+  if (this == parent->getRight()){
+    return parent->getLeft();
+  }
+  else if (this == parent->getLeft()){
+    return parent->getRight();
+  }
+}
+
 Node* Node :: getUncle(){
-  if (getGrandparent()->getValue() < parent->getValue()){
+  if (parent == NULL){
+    return NULL;
+  }
+  else{
+    return parent->getSibling();
+  }
+  /*if (getGrandparent()->getValue() < parent->getValue()){
     return getGrandparent()->getLeft();
   }
-  return getGrandparent()->getRight();
+  return getGrandparent()->getRight();*/
 }
 
 void Node :: setValue(int newvalue){

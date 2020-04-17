@@ -13,6 +13,7 @@ class Node {
   Node* getRight();
   Node* getParent();
   Node* getGrandparent();
+  Node* getSibling();
   Node* getUncle();
   void setValue(int newvalue);
   void setColor(int newcolor);

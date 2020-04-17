@@ -5,10 +5,14 @@
 
 using namespace std;
 void charToIntegerArray(char* carray, int* &iarray, int &size);
-int pow(int a, int b);
-Node* add(Node* current, int value);
-void print(Node* current, int depth);
-
+int pow(int, int);
+Node* add(Node*, int);
+void print(Node*, int);
+void rotateLeft(Node*);
+void rotateRight(Node*);
+void case4(Node*;
+void case4part2(Node*);
+/*Red Black Tree: A type of balanced search tree. Root and NULL nodes are black. If a node is red, children are black. All paths from a node to NULL descendents contain same number of black nodes. Shortest path has all black nodes. Longest alternates between red and black. Insert and remove requires rotation.*/
 
 int main(){
   bool loop = true;
@@ -43,9 +47,16 @@ int main(){
       loop = true;
       int* numberInput = new int[101];
       int size = 0;
+      char* temp = NULL;
       charToIntegerArray(input, numberInput, size);//convert char* to int * array
       for (int i = 0; i < (size); i++){//insert integers into tree, one by one
-	root = add(root, numberInput[i]);//addToTree returns the root each time
+	temp = new Node(numberInput[i]);
+	add(root, temp);
+	rearrange(temp);
+	root = temp;
+	while (root->getParent() != NULL){
+	  root = root->getParent();
+	}
       }
     }
     else if (strcmp(name, "REMOVE") == 0){/*
@@ -111,32 +122,132 @@ void charToIntegerArray(char* carray, int* &iarray, int &size){//converts a char
   }
 }
 
-Node* add(Node* current, int value){//adds a new node with integer value and returns the root each time (in case of NULL tree)
+//Rotations: rearranges subtrees to decrease the height of the tree. Does not affect the order of elements.
+void rotateLeft(Node* blue){//node is blue
+  if (blue->getRight() == NULL){
+    return;
+  }
+  Node* yellow = blue->getRight();//create yellow pointer
+  Node* parent = blue->getParent();//parent of blue
+  blue->setRight(yellow->getLeft());//set blue's right as red
+  yellow->setLeft(blue);//set yellow's left as blue
+  blue->setParent(yellow);//make yellow blue's parent
+  if (blue->getRight() != NULL){
+    blue->getRight()->setParent(blue);
+  }
+  if (parent != NULL){
+    if (blue == parent->getLeft()){
+      parent->setLeft(yellow);
+    }
+    else if (blue == parent->getRight()){
+      parent->setRight(yellow);
+    }
+  }
+  yellow->setParent(parent);
+}
+
+void rotateRight(Node* blue){
+  if (blue->getLeft() == NULL){
+    return;
+  }
+  Node* yellow = blue->getLeft();
+  Node* parent = blue->getParent();
+  blue->setLeft(yellow->getRight());
+  yellow->setRight(blue);
+  blue->setParent(yellow);
+  if (parent != NULL){
+    if (blue->getLeft() != NULL){
+      blue->getLeft->setParent(blue);
+    }
+    else if (blue == parent->getRight()){
+      parent->setRight(yellow);
+    }
+  }
+  yellow->setParent(parent);
+}
+
+
+void add(Node* &current, Node* node){//adds a new node with integer value and returns the root each time (in case of NULL tree)
   if (current == NULL){//if nothing in tree
-    Node* temp = new Node(value);
+    Node* temp = node;
     return temp; 
   }
-  if (value < current->getValue()){//value is smaller than current node, go to left child
-    Node* child = add(current->getLeft(), value);
-    child->setParent(current); //after reach a leaf, set the child parent relationship
-    current->setLeft(child);
-    
+  if (node->getValue() < current->getValue()){//value is smaller than current node, go to left child
+    if (current->getLeft()){
+      add(current->getLeft(), node);
+      return;
+    }
+    else{
+      current->setLeft(node);
+    }
   }
   else{//value is larger (or equal to) go right
-    Node* child = add(current->getRight(), value);
-    child->setParent(current); //after reach a leaf, set child parent relationship
-    current->setRight(child);
+    if (current->getRight()){
+      add(current->getRight(), node);
+    }
+    else{
+      current->setRight(node);
+    }
+    
   }
-  return current;
+  node->setParent(current);
+  node->setColor(2);
+}
+
+void rearrange(Node* current){
+  if (current->getParent() == NULL){
+    current->setColor(1);
+  }
+  else if (current->getParent()->getColor == 1){
+    //nothing
+  }
+  else if (current->getUncle() != NULL && current->getUncle()->getColor() == 2){
+    case3(current);
+  }
+  else{
+    case4(current);
+  }
+}
+
+
+void case3(Node* current){
+  current->getParent()->setColor(1);
+  current->getUncle()->setParent(1);
+  current->getGrandparent()->setColor(2);
+  rearrange(current->getGrandparent());
+}
+
+void case4(Node* current){
+  Node* parent = current->getParent();
+  Node* grandparent = current->getGrandparent();
+  if (current == parent->getRight() && parent == grandparent->getLeft()){
+    rotateLeft(parent);
+    current = current->getLeft();
+  }
+  else if (current == parent->getLeft() && parent == grandparent->getRight()){
+    rotateRight(parent);
+    current = current->getRight();
+  }
+  case4part2(current);
+}
+
+void case4part2(Node* current){
+  Node* parent = current->getParent();
+  Node* grandparent = current->getGrandparent();
+  if (current == parent->getLeft()){
+    rotateRight(grandparent);
+  }
+  else{
+    rotateLeft(grandparent);
+  }
+  parent->setColor(1);
+  grandparent->setColor(2);
 }
 
 void print(Node* current, int depth){
-  if (current = NULL){
-    return;
-  }
   print(current->getRight(), depth+1);//incrementing tabs to bottom most right
   for(int i = 0; i < depth; i++){//print the amount of tabs, then print value
-    cout << "  ";
+    cout << "\t";
   }
   cout << current->getColor() << current->getValue() << endl;
   print(current->getLeft(), depth+1);//end at bottom most left node
