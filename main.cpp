@@ -4,17 +4,23 @@
 #include <fstream>
 
 using namespace std;
+
 void charToIntegerArray(char* carray, int* &iarray, int &size);
 int pow(int, int);
+
 Node* insert(Node*, Node*);
 void add(Node*, Node*);
 void rearrange(Node*);
+
 void print(Node*, int);
+
 void rotateLeft(Node*);
 void rotateRight(Node*);
+
 void case3(Node*);
 void case4(Node*);
 void case4part2(Node*);
+
 /*Red Black Tree: A type of balanced search tree. Root and NULL nodes are black. If a node is red, children are black. All paths from a node to NULL descendents contain same number of black nodes. Shortest path has all black nodes. Longest alternates between red and black. Insert and remove requires rotation.*/
 
 int main(){
@@ -30,7 +36,11 @@ int main(){
     if (strcmp(name, "ADD") == 0){//if the input is ADD
       cout << "Enter the number you want to add: ";
       cin >> value;
-      root = insert(root, new Node(value));//insert new value into tree
+      Node* node = new Node(value);
+      //cout << node->getValue();
+      //cout << node->getColor();
+      root = insert(root, new Node(value));//add to tree and adjust accordingly
+      cout << root->getValue();
       cout << endl;
     }
     else if (strcmp(name, "READ") == 0){//Similar to above
@@ -68,7 +78,7 @@ int main(){
       cout << endl;*/
     }
     else if (strcmp(name, "PRINT") == 0){
-      cout << endl;
+      //cout << root->getValue() << endl;
       print(root,0);//prints visual of tree
     }
     else if (strcmp(name, "QUIT") == 0){//if quit, boolean is false so program will stop
@@ -167,7 +177,7 @@ void rotateRight(Node* blue){
 
 
 Node* insert(Node* root, Node* node){
-  add(node, root);
+  add(root, node);
   rearrange(node);
   root = node;
   while(root->getParent() != NULL){
@@ -179,6 +189,7 @@ Node* insert(Node* root, Node* node){
 void add(Node* current, Node* node){//adds a new node with integer value and returns the root each time (in case of NULL tree)
   if (current == NULL){//if nothing in tree
     current = node;
+    //cout << current->getValue();
     return; 
   }
   if (node->getValue() < current->getValue()){//value is smaller than current node, go to left child
@@ -254,6 +265,9 @@ void case4part2(Node* current){
 }
 
 void print(Node* current, int depth){
+  if (current == NULL){
+    return;
+  }
   print(current->getRight(), depth+1);//incrementing tabs to bottom most right
   for(int i = 0; i < depth; i++){//print the amount of tabs, then print value
     cout << "\t";
