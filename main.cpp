@@ -8,18 +8,17 @@ using namespace std;
 void charToIntegerArray(char* carray, int* &iarray, int &size);
 int pow(int, int);
 
-Node* insert(Node*, Node*);
+Node* insert(Node* &, Node*);
 void add(Node*, Node*);
-void rearrange(Node*);
+void rearrange(Node*, Node* &);
 
 void print(Node*, int);
 
 void rotateLeft(Node*);
 void rotateRight(Node*);
 
-void case3(Node*);
-void case4(Node*);
-void case4part2(Node*);
+void case4(Node*, Node* &);
+void case4part2(Node*, Node* &);
 
 /*Red Black Tree: A type of balanced search tree. Root and NULL nodes are black. If a node is red, children are black. All paths from a node to NULL descendents contain same number of black nodes. Shortest path has all black nodes. Longest alternates between red and black. Insert and remove requires rotation.*/
 
@@ -176,9 +175,9 @@ void rotateRight(Node* blue){
 }
 
 
-Node* insert(Node* root, Node* node){
+Node* insert(Node* &root, Node* node){
   add(root, node);
-  rearrange(node);
+  rearrange(node, root);
   root = node;
   while(root->getParent() != NULL){
     root = root->getParent();
@@ -193,7 +192,7 @@ void add(Node* current, Node* node){//adds a new node with integer value and ret
     return; 
   }
   if (node->getValue() < current->getValue()){//value is smaller than current node, go to left child
-    if (current->getLeft()){
+    if (current->getLeft() != NULL){
       add(current->getLeft(), node);
       return;
     }
@@ -202,8 +201,9 @@ void add(Node* current, Node* node){//adds a new node with integer value and ret
     }
   }
   else{//value is larger (or equal to) go right
-    if (current->getRight()){
+    if (current->getRight() != NULL){
       add(current->getRight(), node);
+      return;
     }
     else{
       current->setRight(node);
@@ -211,32 +211,36 @@ void add(Node* current, Node* node){//adds a new node with integer value and ret
     
   }
   node->setParent(current);
-  node->setColor(2);
 }
 
-void rearrange(Node* current){
-  if (current->getParent() == NULL){
-    current->setColor(1);
+void rearrange(Node* current, Node* &root){
+  if (current->getParent() == NULL){//current is the root
+    current->setColor(1);//color z black
   }
   else if (current->getParent()->getColor() == 1){
     //nothing
   }
-  else if (current->getUncle() != NULL && current->getUncle()->getColor() == 2){
-    case3(current);
+  else if (current->getUncle() != NULL && current->getUncle()->getColor() == 2){//if uncle is red
+    current->getParent()->setColor(1);//parent and uncle to black
+    current->getUncle()->setColor(1);
+    current->getGrandparent()->setColor(2);//grandparent to red
+    rearrange(current->getGrandparent(), root);
   }
   else{
-    case4(current);
+    Node* parent = current->getParent();
+    Node* grandparent = current->getGrandparent();
+    if (current == parent->getRight() && parent == grandparent->getLeft()){
+      rotateLeft(parent);
+      current = current->getLeft();
+    }
+    else if (current == parent->getLeft() && parent == grandparent->getRight()){
+      rotateRight(parent);
+      current = current->getRight();
+    }
+    case4part2(current, root);
   }
 }
-
-
-void case3(Node* current){
-  current->getParent()->setColor(1);
-  current->getUncle()->setColor(1);
-  current->getGrandparent()->setColor(2);
-  rearrange(current->getGrandparent());
-}
-
+/*
 void case4(Node* current){
   Node* parent = current->getParent();
   Node* grandparent = current->getGrandparent();
@@ -250,8 +254,8 @@ void case4(Node* current){
   }
   case4part2(current);
 }
-
-void case4part2(Node* current){
+*/
+void case4part2(Node* current, Node* &root){
   Node* parent = current->getParent();
   Node* grandparent = current->getGrandparent();
   if (current == parent->getLeft()){
@@ -259,6 +263,9 @@ void case4part2(Node* current){
   }
   else{
     rotateLeft(grandparent);
+  }
+  if (grandparent == root){
+    root = parent;
   }
   parent->setColor(1);
   grandparent->setColor(2);
@@ -273,10 +280,10 @@ void print(Node* current, int depth){
     cout << "\t";
   }
   if (current->getColor() == 1){
-    cout << "B";
+    cout << "B ";
   }
   if (current->getColor() == 2){
-    cout << "R";
+    cout << "R ";
   }
   cout << current->getValue() << endl;
   print(current->getLeft(), depth+1);//end at bottom most left node

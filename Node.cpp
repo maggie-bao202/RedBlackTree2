@@ -5,7 +5,7 @@ using namespace std;
 
 Node :: Node(int newvalue){
   value = newvalue;
-  color = 1;
+  color = 2;
   left = NULL;
   right = NULL;
   parent = NULL;
