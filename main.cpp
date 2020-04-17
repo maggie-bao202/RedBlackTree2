@@ -272,6 +272,12 @@ void print(Node* current, int depth){
   for(int i = 0; i < depth; i++){//print the amount of tabs, then print value
     cout << "\t";
   }
-  cout << current->getColor() << current->getValue() << endl;
+  if (current->getColor() == 1){
+    cout << "B";
+  }
+  if (current->getColor() == 2){
+    cout << "R";
+  }
+  cout << current->getValue() << endl;
   print(current->getLeft(), depth+1);//end at bottom most left node
 }
