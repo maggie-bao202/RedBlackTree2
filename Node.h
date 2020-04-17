@@ -4,6 +4,7 @@
 #include <iostream>
 using namespace std;
 
+//Modified BST Node class. Added get grandparent, sibling, uncle
 class Node {
  public:
   Node(int newvalue);
@@ -23,7 +24,7 @@ class Node {
   ~Node();
  private:
   int value;
-  int color;
+  int color;//1 = black. 2 = red.
   Node* left;
   Node* right;
   Node* parent;

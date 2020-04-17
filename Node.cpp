@@ -3,9 +3,9 @@
 
 using namespace std;
 
-Node :: Node(int newvalue){
+Node :: Node(int newvalue){//pass through value
   value = newvalue;
-  color = 2;
+  color = 2;//all nodes are created as red
   left = NULL;
   right = NULL;
   parent = NULL;
@@ -31,11 +31,11 @@ Node* Node :: getParent(){
   return parent;
 }
 
-Node* Node :: getGrandparent(){
+Node* Node :: getGrandparent(){//parent's parent is grandparent
   return parent->getParent();
 }
 
-Node* Node :: getSibling(){
+Node* Node :: getSibling(){//if node is not the root, get the other child
   if (parent == NULL){
     return NULL;
   }
@@ -47,17 +47,13 @@ Node* Node :: getSibling(){
   }
 }
 
-Node* Node :: getUncle(){
+Node* Node :: getUncle(){//uncle is just parent's sibling
   if (parent == NULL){
     return NULL;
   }
   else{
     return parent->getSibling();
   }
-  /*if (getGrandparent()->getValue() < parent->getValue()){
-    return getGrandparent()->getLeft();
-  }
-  return getGrandparent()->getRight();*/
 }
 
 void Node :: setValue(int newvalue){
