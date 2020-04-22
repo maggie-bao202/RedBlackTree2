@@ -19,6 +19,14 @@ void rotateRight(Node*);
 
 void blackUncle(Node*, Node* &);
 
+//Part 2:
+bool search(Node*, Node*);
+
+Node* getNode(Node* int);
+void remove(Node* &, Node*);
+
+void fix(Node*);
+
 /*4/17/2020 Maggie Bao 
 Red Black Tree: A type of balanced search tree. Root and NULL nodes are black. If a node is red, children are black. All paths from a node to NULL descendents contain same number of black nodes. Shortest path has all black nodes. Longest alternates between red and black. Insert and remove requires rotation.*/
 
@@ -61,17 +69,17 @@ int main(){
 	root = insert(root, new Node(numberInput[i]));
       }
     }
-    else if (strcmp(name, "REMOVE") == 0){/* For RedBlackTree Part 2
+    else if (strcmp(name, "REMOVE") == 0){//For RedBlackTree Part 2
       cout << "Enter the number you want to remove: ";
       cin >> value;
       if(search(root, value) == true){//first checks if deleting value is within the tree
 	Node* temp = getNode(root, value); //traverses to deleted node in "temp"
-	removeFromTree(root, temp); //removes the node from tree
+	remove(root, temp); //removes the node from tree
       }
       else {
 	cout << "Not a valid number.";
       }
-      cout << endl;*/
+      cout << endl;
     }
     else if (strcmp(name, "PRINT") == 0){
       print(root,0);//prints visual of tree
@@ -124,7 +132,85 @@ void charToIntegerArray(char* carray, int* &iarray, int &size){//converts a char
 }
 
 /*
-Sources for Red Black Tree:
+Sources for Red Black Tree Part 2:
+
+https://www.youtube.com/watch?v=aA-nLw28eUw
+
+Right-most of left, left-most of right like in BST
+Copy, not swap.
+
+Case 1-- Node to be deleted is red:
+delete the node. If node has a child, replace it with child
+
+Case 2-- Node is black, with red child:
+replace the node with child, make child black
+
+Case 3-- Node is black, with black child:
+Replace node with child, child is called a DOUBLE BLACK NODE. Transformed into normal black node through 6 cases
+
+Deletion focuses on sibling instead of uncle
+
+Double Black Node:
+
+1) Node is a black root. Terminal
+Turn it into a black node
+
+2) Node is black, has black parent, red sibling
+Left child, rotate left. Rotate away from root. To be deleted node is still double black. recolor parent to red, sibling to black
+
+3) Node is black, black parent, black sibling with two black children.
+Push the double black node up, sibling to red
+
+4) Node is black, red parent. Terminal
+Turn it into a black node, Parent black, sibling red
+
+5) Node is black, black parent, and black sibling with one inner red child
+rotate red child away from root, recolor
+
+6) Node is black, black sibling, 1 outer red child. others dont care (Terminal)
+rotate away from root. 
+
+*/
+
+bool search(Node* current, int value){//Searches for a node with matching value as user input.
+  while (current != NULL){
+    if (value == current->getValue()){//if value matches up, return true
+      return true;
+    }
+    if (value < current->getValue()){//traverse down the tree
+      return search(current->getLeft(), value);
+    }
+    if (value > current->getValue()){
+      return search(current->getRight(), value);
+    }
+  }
+  return false;//if not found when reach the end of tree, return false
+}
+
+Node* getNode(Node* current, int value){//Returns the node in which the value matches up to. Used for delete function
+  if (current == NULL){//not really necessary but it is here
+    return current;
+  }
+  if (value == current->getValue()){//if value is found, stop searching and return the node
+    return current;
+  }
+  if (value < current->getValue()){//if value is smaller, go to left child and look
+    return getNode(current->getLeft(), value);
+  }
+  if (value > current->getValue()){//if value is larger, go to right child and look
+    return getNode(current->getRight(), value);
+  }
+}
+
+void remove(Node* &current, int data){
+}
+
+void fix(Node* current){
+}
+
+
+/*
+Sources for Red Black Tree Part 1:
 
 Found these series of youtube videos very helpful:
 
