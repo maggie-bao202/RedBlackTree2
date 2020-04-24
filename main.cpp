@@ -20,10 +20,10 @@ void rotateRight(Node*);
 void blackUncle(Node*, Node* &);
 
 //Part 2:
-bool search(Node*, Node*);
+bool search(Node*, int);
 
-Node* getNode(Node* int);
-void remove(Node* &, Node*);
+Node* getNode(Node*, int);
+void remove(Node* &, Node* &);
 
 void fix(Node*);
 
@@ -37,7 +37,7 @@ int main(){
   Node* root = NULL;
   int value = 0;
   while (loop = true){
-    cout << "Type in a keyword (\"ADD\", \"READ\",\"REMOVE\",\"PRINT\" or \"QUIT\"):"<<endl;
+    cout << "Type in a keyword (\"ADD\", \"READ\", \"REMOVE\", \"SEARCH\", \"PRINT\" or \"QUIT\"):"<<endl;
     cin >> name; //put input into char array keyword
     cin.ignore();
     if (strcmp(name, "ADD") == 0){//if the input is ADD
@@ -74,7 +74,8 @@ int main(){
       cin >> value;
       if(search(root, value) == true){//first checks if deleting value is within the tree
 	Node* temp = getNode(root, value); //traverses to deleted node in "temp"
-	remove(root, temp); //removes the node from tree
+	cout << temp->getValue() << endl;
+        remove(root, temp); //removes the node from tree
       }
       else {
 	cout << "Not a valid number.";
@@ -83,6 +84,17 @@ int main(){
     }
     else if (strcmp(name, "PRINT") == 0){
       print(root,0);//prints visual of tree
+    }
+    else if (strcmp(name, "SEARCH") == 0){
+      cout << "Enter the number you want to search: ";
+      cin >> value;
+      if (search(root, value) == true){//search is a bool function. Traverses down the tree to see if input matches with a node value
+	cout << "The number " << value << " exists within the tree.";
+      }
+      else {
+	cout << "The number " << value << " does not exist within the tree.";
+      }	
+      cout << endl;
     }
     else if (strcmp(name, "QUIT") == 0){//if quit, boolean is false so program will stop
       cout << "Have a nice day!" << endl;
@@ -202,10 +214,43 @@ Node* getNode(Node* current, int value){//Returns the node in which the value ma
   }
 }
 
-void remove(Node* &current, int data){
+void remove(Node* &root, Node* &current){
+  if (current == NULL){//nothing
+    return;
+  }
+  
+  if (current->getColor() == 2){
+    delete current;
+    current = NULL;
+    return;
+  }
+  else{
+    if (current->getLeft() != NULL && current->getLeft()->getColor() == 2){
+    }
+    if (current->getRight() != NULL && current->getRight()->getColor() == 2){
+    }
+    if (current->getLeft() != NULL && current->getLeft()->getColor() == 1){
+    }
+    if (current->getRight() != NULL && current->getRight()->getColor() == 1){
+    }
+  }
+  if (n->getParent() != NULL){
+    
+  /*Case 1-- Node to be deleted is red:
+delete the node. If node has a child, replace it with child
+
+Case 2-- Node is black, with red child:
+replace the node with child, make child black
+
+Case 3-- Node is black, with black child:
+Replace node with child, child is called a DOUBLE BLACK NODE. Transformed into norm\
+al black node through 6 cases
+*/
+  return;
 }
 
 void fix(Node* current){
+  return;
 }
 
 
