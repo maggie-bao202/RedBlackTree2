@@ -75,7 +75,7 @@ int main(){
       if(search(root, value) == true){//first checks if deleting value is within the tree
 	Node* temp = getNode(root, value); //traverses to deleted node in "temp"
 	cout << temp->getValue() << endl;
-        remove(root, temp); //removes the node from tree
+        remove(root, temp, temp->getValue()); //removes the node from tree
       }
       else {
 	cout << "Not a valid number.";
@@ -214,28 +214,55 @@ Node* getNode(Node* current, int value){//Returns the node in which the value ma
   }
 }
 
-void remove(Node* &root, Node* &current){
+void remove(Node* &root, Node* &current, int value){
+  cout << current->getValue() << " "<< current->getColor() << endl;
+  Node* temp = NULL;
   if (current == NULL){//nothing
     return;
   }
-  
-  if (current->getColor() == 2){
-    delete current;
-    current = NULL;
-    return;
+  if (curent->getValue() == value){
+    if (current->getRight() == NULL && current->getLeft() != NULL){
+      temp = current->getLeft();
+    }
+    if (current->getLeft() == NULL && current->getRight() != NULL){
+      temp = current->getRight();
+    }
+    //begin replace
+    temp->getParent() = current->getParent();
+    if (current->getParent() == NULL){
+      root = temp;
+    }
+    else{
+      if (current->getLeft() != NULL){
+	current->getParent()->setLeft(temp);
+      }
+      else{
+	current->getParent()->setRight(temp);
+      }
+    }
+    //end replace
+    
+    if (current->getColor() == 1){
+      if (temp->getColor() == 2){
+	temp->getColor() = 1;
+      }
+      else{
+	//double black
+      }
+    }
+    else {
+      Node* inorderSuccessor = findSmallest(current->getRight());
+      current->setValue(inorderSuccessor->getValue());
+      remove(root, current->getRight(), inorderSuccessor->getValue());
+    }
+  }
+  if (current->getValue() < value){
+    remove(root, current->getRight(), value);
   }
   else{
-    if (current->getLeft() != NULL && current->getLeft()->getColor() == 2){
-    }
-    if (current->getRight() != NULL && current->getRight()->getColor() == 2){
-    }
-    if (current->getLeft() != NULL && current->getLeft()->getColor() == 1){
-    }
-    if (current->getRight() != NULL && current->getRight()->getColor() == 1){
-    }
+    remove(root, current->getLeft(), value);
   }
-  if (n->getParent() != NULL){
-    
+} 
   /*Case 1-- Node to be deleted is red:
 delete the node. If node has a child, replace it with child
 
@@ -246,8 +273,6 @@ Case 3-- Node is black, with black child:
 Replace node with child, child is called a DOUBLE BLACK NODE. Transformed into norm\
 al black node through 6 cases
 */
-  return;
-}
 
 void fix(Node* current){
   return;
