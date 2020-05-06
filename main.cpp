@@ -225,54 +225,76 @@ Node* leftMostNode(Node* current){//find the left most node in tree for the inor
   }
 }
 
-void remove(Node* &root, Node* &current, int value){
+Node* replace(Node* node){
+  if (node->getLeft() != NULL && node->getLeft() != NULL){
+    return LeftMostNode(node->getLeft());
+  }
+  if (node->getLeft() != NULL){
+    return node->getLeft();
+  }
+  if (node->getRight() != NULL){
+    return node->getRight();
+  }
+  else{
+    return NULL;
+  }
+}
+
+void remove(Node* &root, Node* &current){
   cout << current->getValue() << " "<< current->getColor() << endl;
-  Node* temp = NULL;
-  if (current == NULL){//nothing
+  Node* temp = replace(current);
+  Node* parent = current->getParent();
+  if (temp == NULL){
+    if (current == root){
+      root = NULL;
+    }
+    else{
+      if ((temp == NULL || temp->getColor() == 1) && (current->getColor() == 1)){
+	doubleBlack(current);
+      }
+      else{
+	if (current->getSibling() != NULL){
+	  current->getSibling()->getColor(2);
+	}
+      }
+      if (current->getRight() != NULL){
+	parent->setRight(NULL);
+      }
+      else{
+	parent->setLeft(NULL);
+      }
+    }
+    delete current;
     return;
   }
-  if (current->getValue() == value){
-    if (current->getRight() == NULL && current->getLeft() != NULL){
-      temp = current->getLeft();
-    }
-    if (current->getLeft() == NULL && current->getRight() != NULL){
-      temp = current->getRight();
-    }
-    //begin replace
-    temp->setParent(current->getParent());
-    if (current->getParent() == NULL){
-      root = temp;
+  if (current->getLeft() == NULL || current->getRight() == NULL){
+    if (current == root){
+      current->setValue(temp->getValue());
+      current->setLeft(current->setRight(NULL));
+      delete temp;
     }
     else{
       if (current->getLeft() != NULL){
-	current->getParent()->setLeft(temp);
+	parent->setLeft(temp);
       }
       else{
-	current->getParent()->setRight(temp);
+	parent->setRight(temp);
       }
-    }
-    //end replace
-    
-    if (current->getColor() == 1){
-      if (temp->getColor() == 2){
+      delete current;
+      temp->setParent(parent);
+      if (((temp == NULL || temp->getColor() == 1) && (current->getColor() == 1)){
+	doubleBlack(temp);
+      }
+      else{
 	temp->setColor(1);
       }
-      else{
-	//double black
-      }
     }
-    else {
-      Node* successor = leftMostNode(current->getRight());
-      current->setValue(successor->getValue());
-      remove(root, current->getRight(), successor->getValue());
-    }
+    return;
   }
-  if (current->getValue() < value){
-    remove(root, current->getRight(), value);
-  }
-  else{
-    remove(root, current->getLeft(), value);
-  }
+  int temp2 = temp->getValue();
+  temp->setValue(current->getValue());
+  current->getValue(temp2);
+  remove(root, temp);
 } 
   /*Case 1-- Node to be deleted is red:
 delete the node. If node has a child, replace it with child
