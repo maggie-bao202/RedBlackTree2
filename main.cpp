@@ -22,8 +22,10 @@ void blackUncle(Node*, Node* &);
 //Part 2:
 bool search(Node*, int);
 
+Node* leftMostNode(Node* current);
+
 Node* getNode(Node*, int);
-void remove(Node* &, Node* &);
+void remove(Node* &, Node* &, int);
 
 void fix(Node*);
 
@@ -214,13 +216,22 @@ Node* getNode(Node* current, int value){//Returns the node in which the value ma
   }
 }
 
+Node* leftMostNode(Node* current){//find the left most node in tree for the inorder successor using recursion
+  if (current->getLeft() == NULL){//if its the last node before NULL, return that node
+    return current;
+  }
+  else{
+    return leftMostNode(current->getLeft());//traverse to left child
+  }
+}
+
 void remove(Node* &root, Node* &current, int value){
   cout << current->getValue() << " "<< current->getColor() << endl;
   Node* temp = NULL;
   if (current == NULL){//nothing
     return;
   }
-  if (curent->getValue() == value){
+  if (current->getValue() == value){
     if (current->getRight() == NULL && current->getLeft() != NULL){
       temp = current->getLeft();
     }
@@ -228,7 +239,7 @@ void remove(Node* &root, Node* &current, int value){
       temp = current->getRight();
     }
     //begin replace
-    temp->getParent() = current->getParent();
+    temp->setParent(current->getParent());
     if (current->getParent() == NULL){
       root = temp;
     }
@@ -244,16 +255,16 @@ void remove(Node* &root, Node* &current, int value){
     
     if (current->getColor() == 1){
       if (temp->getColor() == 2){
-	temp->getColor() = 1;
+	temp->setColor(1);
       }
       else{
 	//double black
       }
     }
     else {
-      Node* inorderSuccessor = findSmallest(current->getRight());
-      current->setValue(inorderSuccessor->getValue());
-      remove(root, current->getRight(), inorderSuccessor->getValue());
+      Node* successor = leftMostNode(current->getRight());
+      current->setValue(successor->getValue());
+      remove(root, current->getRight(), successor->getValue());
     }
   }
   if (current->getValue() < value){
