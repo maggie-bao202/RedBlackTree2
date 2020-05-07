@@ -24,8 +24,10 @@ bool search(Node*, int);
 
 Node* leftMostNode(Node* current);
 
+void doubleBlack(Node* current);
+
 Node* getNode(Node*, int);
-void remove(Node* &, Node* &, int);
+void remove(Node* &, Node* &);
 
 void fix(Node*);
 
@@ -77,7 +79,7 @@ int main(){
       if(search(root, value) == true){//first checks if deleting value is within the tree
 	Node* temp = getNode(root, value); //traverses to deleted node in "temp"
 	cout << temp->getValue() << endl;
-        remove(root, temp, temp->getValue()); //removes the node from tree
+        remove(root, temp); //removes the node from tree
       }
       else {
 	cout << "Not a valid number.";
@@ -227,7 +229,7 @@ Node* leftMostNode(Node* current){//find the left most node in tree for the inor
 
 Node* replace(Node* node){
   if (node->getLeft() != NULL && node->getLeft() != NULL){
-    return LeftMostNode(node->getLeft());
+    return leftMostNode(node->getLeft());
   }
   if (node->getLeft() != NULL){
     return node->getLeft();
@@ -254,7 +256,7 @@ void remove(Node* &root, Node* &current){
       }
       else{
 	if (current->getSibling() != NULL){
-	  current->getSibling()->getColor(2);
+	  current->getSibling()->setColor(2);
 	}
       }
       if (current->getRight() != NULL){
@@ -270,7 +272,8 @@ void remove(Node* &root, Node* &current){
   if (current->getLeft() == NULL || current->getRight() == NULL){
     if (current == root){
       current->setValue(temp->getValue());
-      current->setLeft(current->setRight(NULL));
+      current->setLeft(NULL);
+      current->setRight(NULL);
       delete temp;
     }
     else{
@@ -282,7 +285,7 @@ void remove(Node* &root, Node* &current){
       }
       delete current;
       temp->setParent(parent);
-      if (((temp == NULL || temp->getColor() == 1) && (current->getColor() == 1)){
+      if ((temp == NULL || temp->getColor() == 1) && (current->getColor() == 1)){
 	doubleBlack(temp);
       }
       else{
@@ -293,9 +296,9 @@ void remove(Node* &root, Node* &current){
   }
   int temp2 = temp->getValue();
   temp->setValue(current->getValue());
-  current->getValue(temp2);
+  current->setValue(temp2);
   remove(root, temp);
-} 
+}
   /*Case 1-- Node to be deleted is red:
 delete the node. If node has a child, replace it with child
 
@@ -310,8 +313,12 @@ al black node through 6 cases
 void fix(Node* current){
   return;
 }
+void doubleBlack(Node* current){
+  cout << "double black" << endl;
+  return;
+}
 
-
+ 
 /*
 Sources for Red Black Tree Part 1:
 
