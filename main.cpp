@@ -5,7 +5,7 @@
 
 using namespace std;
 
-void charToIntegerArray(char* carray, int* &iarray, int &size);
+void charToIntegerArray(char*, int* &, int &);
 int pow(int, int);
 
 Node* insert(Node* &, Node*);
@@ -22,9 +22,9 @@ void blackUncle(Node*, Node* &);
 //Part 2:
 bool search(Node*, int);
 
-Node* leftMostNode(Node* current);
+Node* leftMostNode(Node*);
 
-void doubleBlack(Node* current);
+void doubleBlack(Node* &, Node* &);
 
 Node* getNode(Node*, int);
 void remove(Node* &, Node* &);
@@ -228,8 +228,8 @@ Node* leftMostNode(Node* current){//find the left most node in tree for the inor
 }
 
 Node* replace(Node* node){
-  if (node->getLeft() != NULL && node->getLeft() != NULL){
-    return leftMostNode(node->getLeft());
+  if (node->getLeft() != NULL && node->getRight() != NULL){
+    return leftMostNode(node->getRight());
   }
   if (node->getLeft() != NULL){
     return node->getLeft();
@@ -252,7 +252,7 @@ void remove(Node* &root, Node* &current){
     }
     else{
       if ((temp == NULL || temp->getColor() == 1) && (current->getColor() == 1)){
-	doubleBlack(current);
+	doubleBlack(root, current);
       }
       else{
 	if (current->getSibling() != NULL){
@@ -286,7 +286,7 @@ void remove(Node* &root, Node* &current){
       delete current;
       temp->setParent(parent);
       if ((temp == NULL || temp->getColor() == 1) && (current->getColor() == 1)){
-	doubleBlack(temp);
+	doubleBlack(root, temp);
       }
       else{
 	temp->setColor(1);
@@ -313,9 +313,63 @@ al black node through 6 cases
 void fix(Node* current){
   return;
 }
-void doubleBlack(Node* current){
+void doubleBlack(Node* &root, Node* &node){
   cout << "double black" << endl;
-  return;
+  if (node == root){
+    return;
+  }
+  if (node->getSibling() == NULL){
+    doubleBlack(root, parent);
+  }
+  else{
+    if (node->getSibling()->getColor() == 2){
+      node->getParent()->setColor(2);
+      node->getSibling()->setColor(1);
+      if (node->getParent()->getLeft() == node->getSibling()){
+	  rotateRight(node->getParent());
+      }
+      else{
+	rotateLeft(node->getParent());
+      }
+      doubleBlack(root, parent);
+    }
+    else{
+      if (node->getSibling()->getLeft()->getColor(2) || node->getSibling()->getRight()->getColor(2)){
+	if (node->getParent()->getLeft() == node->getSibling()){
+	  node->getSibling()->getSibling()->setColor(node->getSibling()->getColor());
+	  node->getSibling()->setColor(node->getParent());
+	  rotateRight(node->getParent());
+	}
+	else{
+	  node->getSibling()->getLeft()->setColor(node->getParent()->getParent());
+	  rotateRight(node->getSibling());
+	  rotateLeft(node->getParent());
+	}
+      }
+      else{
+	if(node->getParent()->getLeft() == node->getSibling()){
+	  node->getSibling()->getRight()->setColor(node->getParent()->getColor());
+	  rotateLeft(node->getSibling());
+	  rotateRight(node->getParent());
+	}
+	else{
+	  node->getSibling()->getRight()->setColor(node->getSibling()->getColor());
+	  node->getSibling()->setColor(node->getParent()->getColor());
+	  rotateLeft(node->getParent());
+	}
+      }
+      node->getParent()->setColor(1);
+    }
+    else{
+      node->getSibling()->setColor(2);
+      if (node->getParent()->getColor() == 1){
+	doubleBlack(node->getParent());
+      }
+      else{
+	node->getParent()->setColor(1);
+      }
+    }
+  }
 }
 
  
