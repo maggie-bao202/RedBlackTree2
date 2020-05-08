@@ -24,7 +24,7 @@ bool search(Node*, int);
 
 Node* leftMostNode(Node*);
 
-void doubleBlack(Node* &, Node* &);
+void doubleBlack(Node* &, Node*);
 
 Node* getNode(Node*, int);
 void remove(Node* &, Node* &);
@@ -310,16 +310,13 @@ Replace node with child, child is called a DOUBLE BLACK NODE. Transformed into n
 al black node through 6 cases
 */
 
-void fix(Node* current){
-  return;
-}
-void doubleBlack(Node* &root, Node* &node){
+void doubleBlack(Node* &root, Node* node){
   cout << "double black" << endl;
   if (node == root){
     return;
   }
   if (node->getSibling() == NULL){
-    doubleBlack(root, parent);
+    doubleBlack(root, node->getParent());
   }
   else{
     if (node->getSibling()->getColor() == 2){
@@ -331,47 +328,50 @@ void doubleBlack(Node* &root, Node* &node){
       else{
 	rotateLeft(node->getParent());
       }
-      doubleBlack(root, parent);
+      doubleBlack(root, node->getParent());
     }
     else{
-      if (node->getSibling()->getLeft()->getColor(2) || node->getSibling()->getRight()->getColor(2)){
-	if (node->getParent()->getLeft() == node->getSibling()){
-	  node->getSibling()->getSibling()->setColor(node->getSibling()->getColor());
-	  node->getSibling()->setColor(node->getParent());
-	  rotateRight(node->getParent());
+      if (node->getSibling()->getLeft() != NULL && node->getSibling()->getLeft()->getColor() == 2 || node->getSibling()->getRight() != NULL && node->getSibling()->getRight()->getColor() == 2){
+	if ((node->getSibling()->getLeft() != NULL) && (node->getSibling()->getLeft()->getColor() == 2)){
+	  if (node->getParent()->getLeft() == node->getSibling()){
+	    node->getSibling()->getLeft()->setColor(node->getSibling()->getColor());
+	    node->getSibling()->setColor(node->getParent()->getColor());
+	    rotateRight(node->getParent());
+	  }
+	  else{
+	    node->getSibling()->getLeft()->setColor(node->getParent()->getColor());
+	    rotateRight(node->getSibling());
+	    rotateLeft(node->getParent());
+	  }
 	}
 	else{
-	  node->getSibling()->getLeft()->setColor(node->getParent()->getParent());
-	  rotateRight(node->getSibling());
-	  rotateLeft(node->getParent());
+	  if(node->getParent()->getLeft() == node->getSibling()){
+	    node->getSibling()->getRight()->setColor(node->getParent()->getColor());
+	    rotateLeft(node->getSibling());
+	    rotateRight(node->getParent());
+	  }
+	  else{
+	    node->getSibling()->getRight()->setColor(node->getSibling()->getColor());
+	    node->getSibling()->setColor(node->getParent()->getColor());
+	    rotateLeft(node->getParent());
+	  }
 	}
-      }
-      else{
-	if(node->getParent()->getLeft() == node->getSibling()){
-	  node->getSibling()->getRight()->setColor(node->getParent()->getColor());
-	  rotateLeft(node->getSibling());
-	  rotateRight(node->getParent());
-	}
-	else{
-	  node->getSibling()->getRight()->setColor(node->getSibling()->getColor());
-	  node->getSibling()->setColor(node->getParent()->getColor());
-	  rotateLeft(node->getParent());
-	}
-      }
-      node->getParent()->setColor(1);
-    }
-    else{
-      node->getSibling()->setColor(2);
-      if (node->getParent()->getColor() == 1){
-	doubleBlack(node->getParent());
-      }
-      else{
 	node->getParent()->setColor(1);
+      }
+      else{
+	if (node->getSibling()->getColor() == 1){
+	  node->getSibling()->setColor(2);
+	}
+	if (node->getParent()->getColor() == 1){
+	  doubleBlack(root, node->getParent());
+	}
+	else{
+	  node->getParent()->setColor(1);
+	}
       }
     }
   }
 }
-
  
 /*
 Sources for Red Black Tree Part 1:
