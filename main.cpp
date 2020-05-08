@@ -231,10 +231,10 @@ Node* replace(Node* node){
   if (node->getLeft() != NULL && node->getRight() != NULL){
     return leftMostNode(node->getRight());
   }
-  if (node->getLeft() != NULL){
+  if (node->getLeft() != NULL && node->getRight() == NULL){
     return node->getLeft();
   }
-  if (node->getRight() != NULL){
+  if (node->getRight() != NULL && node->getLeft() == NULL){
     return node->getRight();
   }
   else{
@@ -259,7 +259,7 @@ void remove(Node* &root, Node* &current){
 	  current->getSibling()->setColor(2);
 	}
       }
-      if (current->getRight() != NULL){
+      if (parent->getRight() == current){
 	parent->setRight(NULL);
       }
       else{
@@ -277,7 +277,7 @@ void remove(Node* &root, Node* &current){
       delete temp;
     }
     else{
-      if (current->getLeft() != NULL){
+      if (parent->getLeft() == current){
 	parent->setLeft(temp);
       }
       else{
@@ -315,58 +315,60 @@ void doubleBlack(Node* &root, Node* node){
   if (node == root){
     return;
   }
-  if (node->getSibling() == NULL){
-    doubleBlack(root, node->getParent());
+  Node* parent = node->getParent();
+  Node* sibling = node->getSibling();
+  if (sibling == NULL){
+    doubleBlack(root, parent);
   }
   else{
-    if (node->getSibling()->getColor() == 2){
-      node->getParent()->setColor(2);
-      node->getSibling()->setColor(1);
-      if (node->getParent()->getLeft() == node->getSibling()){
-	  rotateRight(node->getParent());
+    if (sibling->getColor() == 2){
+      parent->setColor(2);
+      sibling->setColor(1);
+      if (parent->getLeft() == sibling){
+	  rotateRight(parent);
       }
       else{
-	rotateLeft(node->getParent());
+	rotateLeft(parent);
       }
-      doubleBlack(root, node->getParent());
+      doubleBlack(root, node);
     }
     else{
-      if (node->getSibling()->getLeft() != NULL && node->getSibling()->getLeft()->getColor() == 2 || node->getSibling()->getRight() != NULL && node->getSibling()->getRight()->getColor() == 2){
-	if ((node->getSibling()->getLeft() != NULL) && (node->getSibling()->getLeft()->getColor() == 2)){
-	  if (node->getParent()->getLeft() == node->getSibling()){
-	    node->getSibling()->getLeft()->setColor(node->getSibling()->getColor());
-	    node->getSibling()->setColor(node->getParent()->getColor());
-	    rotateRight(node->getParent());
+      if ((sibling->getLeft() != NULL && sibling->getLeft()->getColor() == 2) || (sibling->getRight() != NULL && sibling->getRight()->getColor() == 2)){
+	if ((sibling->getLeft() != NULL) && (sibling->getLeft()->getColor() == 2)){
+	  if (parent->getLeft() == parent){
+	    sibling->getLeft()->setColor(sibling->getColor());
+	    sibling->setColor(parent->getColor());
+	    rotateRight(parent);
 	  }
 	  else{
-	    node->getSibling()->getLeft()->setColor(node->getParent()->getColor());
-	    rotateRight(node->getSibling());
-	    rotateLeft(node->getParent());
+	    sibling->getLeft()->setColor(parent->getColor());
+	    rotateRight(sibling);
+	    rotateLeft(parent);
 	  }
 	}
 	else{
-	  if(node->getParent()->getLeft() == node->getSibling()){
-	    node->getSibling()->getRight()->setColor(node->getParent()->getColor());
-	    rotateLeft(node->getSibling());
-	    rotateRight(node->getParent());
+	  if(parent->getLeft() == sibling){
+	    sibling->getRight()->setColor(parent->getColor());
+	    rotateLeft(sibling);
+	    rotateRight(parent);
 	  }
 	  else{
-	    node->getSibling()->getRight()->setColor(node->getSibling()->getColor());
-	    node->getSibling()->setColor(node->getParent()->getColor());
-	    rotateLeft(node->getParent());
+	    sibling->getRight()->setColor(sibling->getColor());
+	    sibling->setColor(parent->getColor());
+	    rotateLeft(parent);
 	  }
 	}
-	node->getParent()->setColor(1);
+	parent->setColor(1);
       }
       else{
-	if (node->getSibling()->getColor() == 1){
-	  node->getSibling()->setColor(2);
+	if (sibling->getColor() == 1){
+	  sibling->setColor(2);
 	}
-	if (node->getParent()->getColor() == 1){
-	  doubleBlack(root, node->getParent());
+	if (parent->getColor() == 1){
+	  doubleBlack(root, parent);
 	}
 	else{
-	  node->getParent()->setColor(1);
+	  parent->setColor(1);
 	}
       }
     }
