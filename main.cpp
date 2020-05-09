@@ -14,8 +14,8 @@ void rearrange(Node*, Node* &);
 
 void print(Node*, int);
 
-void rotateLeft(Node*);
-void rotateRight(Node*);
+void rotateLeft(Node* &, Node*);
+void rotateRight(Node* &, Node*);
 
 void blackUncle(Node*, Node* &);
 
@@ -28,8 +28,6 @@ void doubleBlack(Node* &, Node*);
 
 Node* getNode(Node*, int);
 void remove(Node* &, Node* &);
-
-void fix(Node*);
 
 /*4/17/2020 Maggie Bao 
 Red Black Tree: A type of balanced search tree. Root and NULL nodes are black. If a node is red, children are black. All paths from a node to NULL descendents contain same number of black nodes. Shortest path has all black nodes. Longest alternates between red and black. Insert and remove requires rotation.*/
@@ -231,19 +229,20 @@ Node* replace(Node* node){
   if (node->getLeft() != NULL && node->getRight() != NULL){
     return leftMostNode(node->getRight());
   }
-  if (node->getLeft() != NULL && node->getRight() == NULL){
+  if (node->getLeft() == NULL && node->getRight() == NULL){
+    return NULL;
+  }
+  if (node->getLeft() == NULL){
     return node->getLeft();
   }
-  if (node->getRight() != NULL && node->getLeft() == NULL){
-    return node->getRight();
-  }
   else{
-    return NULL;
+    return node->getRight();
   }
 }
 
 void remove(Node* &root, Node* &current){
-  cout << current->getValue() << " "<< current->getColor() << endl;
+  //cout << current->getValue() << " "<< current->getColor() << endl;
+  //cout << root->getValue() << " " << root->getColor() << endl;
   Node* temp = replace(current);
   Node* parent = current->getParent();
   if (temp == NULL){
@@ -311,7 +310,7 @@ al black node through 6 cases
 */
 
 void doubleBlack(Node* &root, Node* node){
-  cout << "double black" << endl;
+  cout << "DOUBLE BLACK" << endl;
   if (node == root){
     return;
   }
@@ -325,45 +324,44 @@ void doubleBlack(Node* &root, Node* node){
       parent->setColor(2);
       sibling->setColor(1);
       if (parent->getLeft() == sibling){
-	  rotateRight(parent);
+	rotateRight(root, parent);
+	
       }
       else{
-	rotateLeft(parent);
+	rotateLeft(root, parent);
       }
       doubleBlack(root, node);
     }
     else{
       if ((sibling->getLeft() != NULL && sibling->getLeft()->getColor() == 2) || (sibling->getRight() != NULL && sibling->getRight()->getColor() == 2)){
 	if ((sibling->getLeft() != NULL) && (sibling->getLeft()->getColor() == 2)){
-	  if (parent->getLeft() == parent){
+	  if (parent->getLeft() == sibling){
 	    sibling->getLeft()->setColor(sibling->getColor());
 	    sibling->setColor(parent->getColor());
-	    rotateRight(parent);
+	    rotateRight(root, parent);
 	  }
 	  else{
 	    sibling->getLeft()->setColor(parent->getColor());
-	    rotateRight(sibling);
-	    rotateLeft(parent);
+	    rotateRight(root, sibling);
+	    rotateLeft(root, parent);
 	  }
 	}
 	else{
 	  if(parent->getLeft() == sibling){
 	    sibling->getRight()->setColor(parent->getColor());
-	    rotateLeft(sibling);
-	    rotateRight(parent);
+	    rotateLeft(root, sibling);
+	    rotateRight(root, parent);
 	  }
 	  else{
 	    sibling->getRight()->setColor(sibling->getColor());
 	    sibling->setColor(parent->getColor());
-	    rotateLeft(parent);
+	    rotateLeft(root, parent);
 	  }
 	}
 	parent->setColor(1);
       }
       else{
-	if (sibling->getColor() == 1){
-	  sibling->setColor(2);
-	}
+	sibling->setColor(2);
 	if (parent->getColor() == 1){
 	  doubleBlack(root, parent);
 	}
@@ -414,14 +412,16 @@ blue            yellow
 
 */
 
-void rotateLeft(Node* blue){//node is blue
+void rotateLeft(Node* &root, Node* blue){//node is blue
   if (blue->getRight() == NULL){//if yellow does not exist
     return;
   }
 
   Node* yellow = blue->getRight();//create yellow pointer
   Node* parent = blue->getParent();//parent of blue
-  
+  if (blue == root){
+    root = yellow;
+  }
   blue->setRight(yellow->getLeft());//set blue's right as red
   yellow->setLeft(blue);//set yellow's left as blue
   blue->setParent(yellow);//make yellow blue's parent
@@ -440,14 +440,16 @@ void rotateLeft(Node* blue){//node is blue
   yellow->setParent(parent);
 }
 
-void rotateRight(Node* yellow){//similar to left-rotate. Rotate yellow (see example in video)
+void rotateRight(Node* &root, Node* yellow){//similar to left-rotate. Rotate yellow (see example in video)
   if (yellow->getLeft() == NULL){
     return;
   }
   
   Node* blue = yellow->getLeft(); //blue is left child of yellow 
   Node* parent = yellow->getParent();//parent of yellow
-
+  if (yellow == root){
+    root = blue;
+  }
   yellow->setLeft(blue->getRight());//set yellow's left as red
   blue->setRight(yellow); //set blue's right as yellow
   yellow->setParent(blue); //set yellow's parent as blue
@@ -526,21 +528,21 @@ void blackUncle(Node* current, Node* &root){//if uncle is black
   Node* parent = current->getParent();
   Node* grandparent = current->getGrandparent();
   if (current == parent->getRight() && parent == grandparent->getLeft()){//if triange
-    rotateLeft(parent);//rotate parent opposite direction of grandparent
+    rotateLeft(root, parent);//rotate parent opposite direction of grandparent
     current = current->getLeft();//original parent becomes current
   }
   else if (current == parent->getLeft() && parent == grandparent->getRight()){//if triangle
-    rotateRight(parent);
+    rotateRight(root, parent);
     current = current->getRight();
   }
 
   parent = current->getParent();
   grandparent = current->getGrandparent();
   if (current == parent->getLeft()){//if grandparent, parent, current form a line on left
-    rotateRight(grandparent);//rotate grandparent
+    rotateRight(root, grandparent);//rotate grandparent
   }
   else{//line on right
-    rotateLeft(grandparent);
+    rotateLeft(root, grandparent);
   }
   if (root == grandparent){//reassign the root if changed (debugging)
     root = parent;

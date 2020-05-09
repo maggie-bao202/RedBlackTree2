@@ -39,12 +39,10 @@ Node* Node :: getSibling(){//if node is not the root, get the other child
   if (parent == NULL){
     return NULL;
   }
-  if (this == parent->getRight()){
-    return parent->getLeft();
-  }
-  else if (this == parent->getLeft()){
+  if (this == parent->getLeft()){
     return parent->getRight();
   }
+  return parent->getLeft();
 }
 
 Node* Node :: getUncle(){//uncle is just parent's sibling
