@@ -29,8 +29,13 @@ void doubleBlack(Node* &, Node*);
 Node* getNode(Node*, int);
 void remove(Node* &, Node* &);
 
-/*4/17/2020 Maggie Bao 
-Red Black Tree: A type of balanced search tree. Root and NULL nodes are black. If a node is red, children are black. All paths from a node to NULL descendents contain same number of black nodes. Shortest path has all black nodes. Longest alternates between red and black. Insert and remove requires rotation.*/
+/*
+4/17/2020 Maggie Bao 
+Red Black Tree: A type of balanced search tree. Root and NULL nodes are black. If a node is red, children are black. All paths from a node to NULL descendents contain same number of black nodes. Shortest path has all black nodes. Longest alternates between red and black. Insert and remove requires rotation.
+
+5/8/2020 Maggie Bao
+Red Black Tree Part 2: The user can search if a number is in the tree. Additionally, the user can remove nodes and the tree will update itself as necessary.
+*/
 
 int main(){
   bool loop = true;
@@ -148,6 +153,11 @@ void charToIntegerArray(char* carray, int* &iarray, int &size){//converts a char
 /*
 Sources for Red Black Tree Part 2:
 
+replace, doubleBlack, remove functions found on:
+https://www.geeksforgeeks.org/red-black-tree-set-3-delete-2/
+
+Notes:
+
 https://www.youtube.com/watch?v=aA-nLw28eUw
 
 Right-most of left, left-most of right like in BST
@@ -225,40 +235,40 @@ Node* leftMostNode(Node* current){//find the left most node in tree for the inor
   }
 }
 
-Node* replace(Node* node){
-  if (node->getLeft() != NULL && node->getRight() != NULL){
+Node* replace(Node* node){//find the replacement node
+  if (node->getLeft() != NULL && node->getRight() != NULL){//go to the very left
     return leftMostNode(node->getRight());
   }
-  if (node->getLeft() == NULL && node->getRight() == NULL){
+  if (node->getLeft() == NULL && node->getRight() == NULL){//if no children
     return NULL;
   }
-  if (node->getLeft() == NULL){
+  if (node->getLeft() != NULL){//if left child exists, go down left
     return node->getLeft();
   }
-  else{
+  else{//go right otherwise
     return node->getRight();
   }
 }
 
-void remove(Node* &root, Node* &current){
+void remove(Node* &root, Node* &current){//main remove function
   //cout << current->getValue() << " "<< current->getColor() << endl;
   //cout << root->getValue() << " " << root->getColor() << endl;
-  Node* temp = replace(current);
+  Node* temp = replace(current); //replacement node
   Node* parent = current->getParent();
-  if (temp == NULL){
-    if (current == root){
+  if (temp == NULL){//if current is leaf
+    if (current == root){//node is root
       root = NULL;
     }
     else{
-      if ((temp == NULL || temp->getColor() == 1) && (current->getColor() == 1)){
+      if ((temp == NULL || temp->getColor() == 1) && (current->getColor() == 1)){//both are black and replacement is a leaf
 	doubleBlack(root, current);
       }
-      else{
+      else{//if either is red
 	if (current->getSibling() != NULL){
-	  current->getSibling()->setColor(2);
+	  current->getSibling()->setColor(2);//make sibling red
 	}
       }
-      if (parent->getRight() == current){
+      if (parent->getRight() == current){//reassign, then delete
 	parent->setRight(NULL);
       }
       else{
@@ -268,14 +278,14 @@ void remove(Node* &root, Node* &current){
     delete current;
     return;
   }
-  if (current->getLeft() == NULL || current->getRight() == NULL){
-    if (current == root){
+  if (current->getLeft() == NULL || current->getRight() == NULL){//if current has 1 child
+    if (current == root){//if root, copy value then delete
       current->setValue(temp->getValue());
       current->setLeft(NULL);
       current->setRight(NULL);
       delete temp;
     }
-    else{
+    else{//move temp up the tree
       if (parent->getLeft() == current){
 	parent->setLeft(temp);
       }
@@ -284,75 +294,65 @@ void remove(Node* &root, Node* &current){
       }
       delete current;
       temp->setParent(parent);
-      if ((temp == NULL || temp->getColor() == 1) && (current->getColor() == 1)){
+      if ((temp == NULL || temp->getColor() == 1) && (current->getColor() == 1)){//both are black, double black
 	doubleBlack(root, temp);
       }
-      else{
+      else{//either are red, turn black
 	temp->setColor(1);
       }
     }
     return;
   }
-  int temp2 = temp->getValue();
+  int temp2 = temp->getValue();//if temp has two values, swap
   temp->setValue(current->getValue());
   current->setValue(temp2);
   remove(root, temp);
 }
-  /*Case 1-- Node to be deleted is red:
-delete the node. If node has a child, replace it with child
 
-Case 2-- Node is black, with red child:
-replace the node with child, make child black
-
-Case 3-- Node is black, with black child:
-Replace node with child, child is called a DOUBLE BLACK NODE. Transformed into norm\
-al black node through 6 cases
-*/
-
-void doubleBlack(Node* &root, Node* node){
-  cout << "DOUBLE BLACK" << endl;
+void doubleBlack(Node* &root, Node* node){//what to do with double black node in delete
+  //cout << "DOUBLE BLACK" << endl;
   if (node == root){
     return;
   }
   Node* parent = node->getParent();
   Node* sibling = node->getSibling();
-  if (sibling == NULL){
+  if (sibling == NULL){//no sibling, go up the tree
     doubleBlack(root, parent);
   }
   else{
-    if (sibling->getColor() == 2){
+    if (sibling->getColor() == 2){//if sibling red
       parent->setColor(2);
       sibling->setColor(1);
-      if (parent->getLeft() == sibling){
+      if (parent->getLeft() == sibling){//if sibling is on left
 	rotateRight(root, parent);
 	
       }
-      else{
+      else{//if sibling is on right
 	rotateLeft(root, parent);
       }
       doubleBlack(root, node);
     }
-    else{
-      if ((sibling->getLeft() != NULL && sibling->getLeft()->getColor() == 2) || (sibling->getRight() != NULL && sibling->getRight()->getColor() == 2)){
-	if ((sibling->getLeft() != NULL) && (sibling->getLeft()->getColor() == 2)){
-	  if (parent->getLeft() == sibling){
+    else{//sibling is black
+      if ((sibling->getLeft() != NULL && sibling->getLeft()->getColor() == 2) || (sibling->getRight() != NULL && sibling->getRight()->getColor() == 2)){//if sibling has red children
+	if ((sibling->getLeft() != NULL) && (sibling->getLeft()->getColor() == 2)){//lf the left child is red
+	  if (parent->getLeft() == sibling){//if sibling is on left
 	    sibling->getLeft()->setColor(sibling->getColor());
 	    sibling->setColor(parent->getColor());
 	    rotateRight(root, parent);
 	  }
-	  else{
+	  else{//if sibling is on right
 	    sibling->getLeft()->setColor(parent->getColor());
 	    rotateRight(root, sibling);
 	    rotateLeft(root, parent);
 	  }
 	}
-	else{
-	  if(parent->getLeft() == sibling){
+	else{//if the right child is red
+	  if(parent->getLeft() == sibling){//if sibling is on left
 	    sibling->getRight()->setColor(parent->getColor());
 	    rotateLeft(root, sibling);
 	    rotateRight(root, parent);
 	  }
-	  else{
+	  else{//if sibling is on right
 	    sibling->getRight()->setColor(sibling->getColor());
 	    sibling->setColor(parent->getColor());
 	    rotateLeft(root, parent);
@@ -360,7 +360,7 @@ void doubleBlack(Node* &root, Node* node){
 	}
 	parent->setColor(1);
       }
-      else{
+      else{//both children black
 	sibling->setColor(2);
 	if (parent->getColor() == 1){
 	  doubleBlack(root, parent);
